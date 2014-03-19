@@ -45,7 +45,7 @@ treelist$map.label[is.na(treelist$map.label)] <- treelist$plot[is.na(treelist$ma
 write.csv(treelist, "gumo-tree-plots.csv", row.names=FALSE)
 
 # redo lat/lon because data in csv files does not look to ahve correct precision?
-gpsexport <- data.frame(Name=paste(treelist$spcode,treelist$plot, sep=""), Latitude=treelist$lat, Longitude=treelist$lon)
+gpsexport <- data.frame(Name=paste(treelist$spcode,treelist$plot, sep=""), Latitude=treelist$newlat, Longitude=treelist$newlon)
 write.csv(gpsexport, "gumo-tree-plots-gps-export.csv", row.names=FALSE)
 
 # now upload to gps using command
