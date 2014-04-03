@@ -46,7 +46,5 @@ None. Project started in late February.
   
 ## Manuscripts related to project: ##
 
-[Format: manuscript title, authors, status (in prep, submitted, accepted, in press), journal or publisher of report, and the expected date of submission or publication.]
-
 "Plant dieback under exceptional drought driven by elevation, not by plant traits, in Big Bend National Park, Texas USA." Waring, E. and D.W. Schwilk. *PeerJ*, in revision.
 
