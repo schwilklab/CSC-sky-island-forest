@@ -1,1 +1,11 @@
-/tree-selection/GUMO/.Rhistory
+# R
+*.Rhistory
+*.Rdata
+
+# reports
+SC-CSC-reports/*.aux
+SC-CSC-reports/*.log
+SC-CSC-reports/*.out
+SC-CSC-reports/*.pdf
+SC-CSC-reports/*.html
+SC-CSC-reports/*.tex
