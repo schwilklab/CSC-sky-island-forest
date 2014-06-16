@@ -1,0 +1,17 @@
+genus,specific.epithet,family,spcode,display.name,CM,DM,GM
+Arbutus,xalapensis,Ericaceae,ARXA80,A. xalapensis,1,1,1
+Juniperus,coahuilensis,Cupressaceae,JUCO11,J. coahuilensis,,1,
+Juniperus,deppeana,Cupressaceae,JUDE2,J. deppeana,1,1,1
+Juniperus,flaccida,Cupressaceae,JUFL,J. flaccida,1,,
+Juniperus,pinchotii,Cupressaceae,JUPI,J. pinchotii,1,,1
+Pinus,cembroides,Pinaceae,PICE,P. cembroides,,1,
+Pinus,edulis,Pinaceae,PIED,P. edulis,,,1
+Pinus,ponderosa,Pinaceae,PIPO,P. ponderosa,1,1,1
+Pinus,strobiformis,Pinaceae,PIST3,P. strobiformis,,1,1
+Quercus,emoryi,Fagaceae,QUEM,Q. emoryi,1,1,
+Quercus,gambelii,Fagaceae,QUGA,Q. gambelii,1,1,1
+Quercus,gravesii,Fagaceae,QUGR2,Q. gravesii,1,1,
+Quercus,grisea,Fagaceae,QUGR3,Q. grisea,1,1,1
+Quercus,hypoleucoides,Fagaceae,QUHY,Q. hypoleucoides,,1,
+Quercus,muehlenbergii,Fagaceae,QUMO,Q. muehlenbergii,,1,1
+Quercus,pungens,Fagaceae,QUPU,Q. pungens,1,,1
