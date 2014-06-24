@@ -1,0 +1,10 @@
+variable,type,units,description
+tag,string,,"Tree tag.  Round aluminum tags with 'Schwilk' before number.  Ranges: 1001-1100 GM, 1101-1200 CM, 1201-1300 DM"
+spcode,string,,USDA species code
+lat,numeric,degrees,"Latitude in decimal degrees, Spheroid WGS84"
+lon,numeric,degrees,"Longitude in decimal degrees, Spheroid WGS84"
+DBH,numeric,cm,Diameter at breast height of main stem
+stem.collected,string,,"YES= stem collected for hydraulics, empty=no stem collected"
+mtn,string,,"Mountain range. CM=Chisos, DM=Davis, GM=Guadalupes"
+area,string,,"Region, trail or trailhead"
+notes,string,,Any additional notes

@@ -1,0 +1,15 @@
+variable,type,units,description
+date.collected,string,,The date we cut the stem from the tree in the field.
+date.spun,string,,The date we ran the experiment on the stem.
+tag,string,,Some trees are tagged with an identification number on the actual bark.
+spcode,string,,"USDA species code, see http://plants.usda.gov/java/"
+RPM,numeric,RPM,Centrifuge speed to apply tennsion
+flow.bg.pre,numeric,mg s^-1,Background flow rate (often negative due to evaporation from reservoir on balance) before measurement
+height.balance.pre,numeric,cm,Height of water level in balance reservoir before measurement period
+flow,numeric,mg s^-1,Measured flow rate through stem segment onto balance
+flow.bg.post,numeric,mg s^-1,Background flow rate (often negative due to evaporation from reservoir on balance) after measurement
+height.balance.post,numeric,cm,Height of water level in balance reservoir after measurement period
+temp,numeric,degrees C,The temperature of the room/water.
+cent.temp,numeric,degrees C,The temperature of the centrifuge.
+stem.length,numeric,cm,Length of stem segment at time of measurement
+notes,string,,Specific notes about the measurement

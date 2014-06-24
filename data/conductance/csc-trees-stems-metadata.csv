@@ -1,0 +1,14 @@
+variable,type,units,description
+tag,string,,Some trees are tagged with an identification number on the actual bark.
+date.collected,string,,The date we cut the stem from the tree in the field.
+spcode,string,,"USDA species code, see http://plants.usda.gov/java/"
+leaf.area,numeric,cm^2,Total area of all distal leaves
+stem.diam,numeric,,The stem diameter taken at two points on the stem using callipers.
+dw.leaf,numeric,g,Dry mass of all distal leaves
+stem.diam1,numeric,cm,"Diameter of stem at distal end, excluding bark"
+stem.diam1,numeric,cm,"Diameter of stem at distal end, excluding bark"
+pith.diam,numeric,cm,Diamer of pith at distal end
+water.potential.PD,numeric,MPa,Pre dawn water potential of tree before stem collection
+water.potential.MD,numeric,,Mid day water potential of tree before stem collection
+notes,string,,Additional collection or stem notes
+use,string,,Use this stem in measurements (good curve)
