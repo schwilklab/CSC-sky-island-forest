@@ -2,8 +2,10 @@
 # code to take tree location files Helen sent and convert to one file for gps upload
 
 library(reshape2)
+library(plyr)
 library(rgdal)
 library(sp)
+
 
 strip.extension <- function(s){
   temp<-strsplit(s,".", fixed=TRUE)
@@ -15,16 +17,19 @@ strip.extension <- function(s){
 
 
 
-convert.coords <- function(fl) {
+merge.data <- function(fl) {
     treelist <- data.frame()
     for (tf in fl) {
         d <- read.csv(tf, stringsAsFactors=FALSE)
         n <- strip.extension(basename(tf))[1]
     # fix names as file header hsa some trailing underscores, etc
 #    names(d) <- c("plot", "UTM.E", "UTM.N", "IV", "NEAR.FID", "NEAR.DIST", "lon", "lat", "map.label")
-        d$spcode <- n
+        
+        # Helen's data is in really inconsistent formats, need to manually
+        # check order of northing and easting.
+        r <- data.frame(plot = d$PLOT, northing = d$NORTHING, easting = d$EASTING, spcode = n)
         print( n)
-        treelist <- rbind(treelist, d)
+        treelist <- rbind.fill(treelist, r)
     }
 
     return(treelist)
@@ -34,14 +39,14 @@ convert.coords <- function(fl) {
 
 # CM
 CMfiles <- list.files(path="./CM/plots", pattern="*.csv",full.names=TRUE)
-CMdata <- convert.coords(CMfiles)
+CMdata <- merge.data(CMfiles)
 CMdata$mtn <- "CM"
 
 DMfiles <- list.files(path="./DM/plots", pattern="*.csv",full.names=TRUE)
-DMdata <- convert.coords(CMfiles)
+DMdata <- merge.data(DMfiles)
 DMdata$mtn <- "DM"
 
-allplots <- rbind(CMdata, DMdata)
+allplots <- rbind.fill(CMdata, DMdata)
 
 
 #species <- strip.extension(basename(tfiles))
@@ -56,7 +61,7 @@ allplots$lat <- coordinates(latlon)[,2]
 write.csv(allplots, "CM-DM-tree-plots.csv", row.names=FALSE)
 
 # redo lat/lon because data in csv files does not look to ahve correct precision?
-gpsexport <- data.frame(Name=paste(allplots$spcode, allplots$PLOT, sep="_"), Latitude=allplots$lat, Longitude=allplots$lon, Description=allplots$mtn)
+gpsexport <- data.frame(Name=paste(allplots$spcode, allplots$plot, sep="_"), Latitude=allplots$lat, Longitude=allplots$lon, Description=allplots$mtn)
 write.csv(gpsexport, "CM-DM-tree-plots-gps-export.csv", row.names=FALSE)
 
 # now upload to gps using command
