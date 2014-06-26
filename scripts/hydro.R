@@ -62,7 +62,7 @@ rpm2mpa <- function(RPM, r, den) {
 
 ## Function curveCalcs
 ## produce all calculated values from a vulnerability curve data frame
-curveCalcs <- function(df) {
+curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
    # water density at temperature
    df$water.den <- waterDensity(df$temp)
    df$cent.water.den <- waterDensity(df$cent.temp)
@@ -83,9 +83,14 @@ curveCalcs <- function(df) {
    # Calculate K in kg s^-1 m^-1 MPa^1:
    df$K <-  (df$flow.true / df$headp ) * df$stem.length * 0.01
 
-   # get stem specific K in  kg s^-1 m^-3 MPa^1:
-   df$K.stem <- df$K / (((df$stem.diam1 + df$stem.diam2)/4.0)^2 * pi)
-   df$K.leaf <- df$K / (df$leaf.area / 1000)  # leaf area in square meters
+   if(getKstem) {
+       # get stem specific K in  kg s^-1 m^-3 MPa^1:
+       df$K.stem <- df$K / (((df$stem.diam1 + df$stem.diam2)/4.0)^2 * pi)
+   }
+
+   if(getKLeaf) {
+       df$K.leaf <- df$K / (df$leaf.area / 1000)  # leaf area in square meters
+   }
 
 
    # temp fix
