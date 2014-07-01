@@ -1,0 +1,7 @@
+variable,type,units,description
+tag,string,,Tree tag. See '../tagged_trees.csv'
+spcode,string,,USDA species code
+diam1,numeric,cm,Diameter of fascicle base
+diam2,numeric,cm,Diameter of fascicle base 90 degrees to first measurement
+length,numeric,cm,Length of needles in sample (or needle sections)
+needles.per.fascicle,numeric,,Number of needles in fascicle
