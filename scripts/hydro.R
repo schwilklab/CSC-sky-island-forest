@@ -47,18 +47,18 @@ waterDensity <- function(t){
 
 # Calculate applied tension from RPM
 # from Alder et al and Jacobsen
-mpa2rpm <- function(x, r, den) {
-  x <- -x*10^6
-  rps <- sqrt( (2 * x) / (r^2 * den) )
-  return (rps * 60/(2*pi))
-}
-
 rpm2mpa <- function(RPM, r, den) {
     v <- -0.000001 * ( (RPM*2*pi / 60)^2 * r^2 * den) / 2
     v[RPM==0] <- 0
     return(v)
 }
 
+# and reverse:
+mpa2rpm <- function(x, r, den) {
+  x <- -x*10^6
+  rps <- sqrt( (2 * x) / (r^2 * den) )
+  return (rps * 60/(2*pi))
+}
 
 ## Function curveCalcs
 ## produce all calculated values from a vulnerability curve data frame
@@ -70,7 +70,11 @@ curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
    df$cent.water.den[is.na(df$cent.water.den)] <- df$water.den[is.na(df$cent.water.den)]
    
    # actual tension applied
+
+   # centrifgue method:
    df$psi.real <-  rpm2mpa(df$RPM, RADIUS, df$cent.water.den)
+   # or, if RPM is missing then we know that we used air injection:
+   df$psi.real[is.na(df$psi.real)] <- df$air.MPa[is.na(df$psi.real)]
 
    # Calculate pressure differential in MPa:
    df$headp <- (  (df$height.head - (df$height.balance.post + df$height.balance.pre)/2) *.01)  *
