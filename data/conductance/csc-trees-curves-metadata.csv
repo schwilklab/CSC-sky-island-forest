@@ -3,6 +3,7 @@ date.collected,string,,The date we cut the stem from the tree in the field.
 date.spun,string,,The date we ran the experiment on the stem.
 tag,string,,Some trees are tagged with an identification number on the actual bark.
 spcode,string,,"USDA species code, see http://plants.usda.gov/java/"
+air.MPa,numeric,MPa,"Tension applied via air injection method, positive pressure"
 RPM,numeric,RPM,Centrifuge speed to apply tennsion
 flow.bg.pre,numeric,mg s^-1,Background flow rate (often negative due to evaporation from reservoir on balance) before measurement
 height.balance.pre,numeric,cm,Height of water level in balance reservoir before measurement period
