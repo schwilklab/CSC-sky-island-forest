@@ -1,0 +1,4 @@
+variable,type,units,description
+tag,string,,Tree tag.  See 'tagged-trees.csv'
+area,numeric,cm^2,Total projected (one-sided) area of sample. laminar punches from approx. 5 leaves
+mass,numeric,g,Total mass of sample after 48 hours drying
