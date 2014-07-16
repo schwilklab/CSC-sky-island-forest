@@ -9,6 +9,7 @@ SC-CSC-reports/*.out
 SC-CSC-reports/*.pdf
 SC-CSC-reports/*.html
 SC-CSC-reports/*.tex
+SC-CSC-reports/balances/*
 
 # kml files for visualization
 *.kml
