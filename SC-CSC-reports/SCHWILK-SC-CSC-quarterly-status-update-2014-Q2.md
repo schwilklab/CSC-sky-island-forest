@@ -54,5 +54,5 @@ None. Project started in late February. We update the GitHub repository continuo
   
 ## Manuscripts related to project: ##
 
-"Plant dieback under exceptional drought driven by elevation, not by plant traits, in Big Bend National Park, Texas USA." Waring, E. and D.W. Schwilk. *PeerJ*, in press.
+Waring, E.F. and D.W. Schwilk. 2014. Plant dieback under exceptional drought driven by elevation, not by plant traits, in Big Bend National Park, Texas, USA. *PeerJ* 2:e477 http://dx.doi.org/10.7717/peerj.477
 
