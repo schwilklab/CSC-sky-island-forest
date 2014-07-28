@@ -31,7 +31,7 @@ p <- ggplot(treecurves, aes(psi.real, PLC)) +
 
 p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
 
-ggsave("../results-plots/treecurves-2013-vuln-by-species.pdf")
+ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
 
 
 
