@@ -18,6 +18,7 @@ G0 <- 9.80665
 ER <- 6371000  # earth mean radius
 GRAV <- G0 * (ER / (ER+ELEVATION)  )^2  # gravity in lubbock
 RADIUS <- 0.12654 / 2.0  # well top to well top
+PIPETTE_CORR <- 0.00481697   # flow_true = flow_measured - (flow_measured x PIPETTE_CORR)
 
 # Utility functions
 
@@ -80,8 +81,11 @@ curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
    df$headp <- (  (df$height.head - (df$height.balance.post + df$height.balance.pre)/2) *.01)  *
    df$water.den * GRAV * 0.000001
    
-   # Calculate conductivity, K, need stem length, for now use "radius" * 2
-   #df$stem.l <- df$radius * 2.0 * 0.01  # get in m
+   # pipette correction
+   df$flow <- df$flow - (df$flow*PIPETTE_CORR)
+   df$flow.bg.pre <- df$flow.bg.pre - (df$flow.bg.pre*PIPETTE_CORR)
+   df$flow.bg.post <- df$flow.bg.post - (df$flow.bg.post*PIPETTE_CORR)
+   # substract background flow
    df$flow.true <- (df$flow - (df$flow.bg.pre + df$flow.bg.post)/2) * 0.001 * 0.001  # kg/s
 
    # Calculate K in kg s^-1 m^-1 MPa^1:
@@ -89,16 +93,20 @@ curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
 
    if(getKstem) {
        # get stem specific K in  kg s^-1 m^-3 MPa^1:
-       df$K.stem <- df$K / (((df$stem.diam1 + df$stem.diam2)/4.0)^2 * pi)
+       df$K.stem <- df$K / (((df$stem.diam1 + df$stem.diam2)/200.0)^2 * pi) # stem diam convert cm to m and divide by 2 for radius
    }
 
    if(getKLeaf) {
-       df$K.leaf <- df$K / (df$leaf.area / 1000)  # leaf area in square meters
+       df$K.leaf <- df$K / (df$leaf.area / 1000.0)  # leaf area in square meters
    }
 
 
    # temp fix
    df$psi.real[is.na(df$psi.real)] <- -0.05  # TODO: fix this
+
+   # fatigue corr point
+   df <- ddply(df, .(tag, date.collected, flushed), transform,
+          fc.point = K ==  K[closest(psi.real, -0.25)])
 
    # calculate PLC by dividing each K by the K at highest Psi. Assumes that a
    # single curve is distinguished by tag, date.collected, and flushed (T/F)
