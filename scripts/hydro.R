@@ -75,7 +75,7 @@ curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
    # centrifgue method:
    df$psi.real <-  rpm2mpa(df$RPM, RADIUS, df$cent.water.den)
    # or, if RPM is missing then we know that we used air injection:
-   df$psi.real[is.na(df$psi.real)] <- df$air.MPa[is.na(df$psi.real)]
+   df$psi.real[is.na(df$psi.real)] <-  - df$air.MPa[is.na(df$psi.real)]
 
    # Calculate pressure differential in MPa:
    df$headp <- (  (df$height.head - (df$height.balance.post + df$height.balance.pre)/2) *.01)  *
