@@ -3,14 +3,14 @@
 
 library(plyr)
 
-trees <- read.csv("../data/tagged_trees.csv")
+trees <- read.csv("../data/tagged_trees.csv", stringsAsFactors=FALSE)
 
 # check number of tagged trees by mtn range and by species
 ddply(trees, .(mtn, spcode), summarize, count = length(tag))
 
 
 
-# get more sig digits from raw gps downlaods. Still need to do this for late
+# get more sig digits from raw gps downloads. Still need to do this for late
 # July dm trip
 ## gps <- read.csv("../data/csc-gps-trees.csv")
 ## m <- merge(trees, gps, all.x=TRUE)
@@ -19,3 +19,21 @@ ddply(trees, .(mtn, spcode), summarize, count = length(tag))
 
 ## write.csv(m, "new-tagged-trees.csv")
 
+
+## Check  leaf data for missing values, etc
+CNleaves <- read.csv("../data/leaves/CN-leaves.csv", stringsAsFactors=FALSE)
+pines <- read.csv("../data/leaves/CN-leaves-pines-dimensions.csv", stringsAsFactors=FALSE)
+
+have.area <- subset(CNleaves,  ! is.na(area))$tag
+have.area.pines <- unique(pines$tag[! is.na(pines$diam1)])
+have.area <- c(have.area, have.area.pines)
+## missing areas?
+subset(trees, ! tag %in% have.area)[,c(1,2,7,9)]
+
+## missing or duplicated masses?
+have.mass <- have.area <- subset(CNleaves,  ! is.na(mass))$tag
+have.mass[duplicated(have.mass)] # 2 dupes
+subset(trees, ! tag %in% have.mass)[,c(1,2,7,9)]
+
+# missing mass but have area:
+subset(trees, tag %in% have.area & ! tag %in% have.mass)[,c(1,2,7,9)] ## No missing!
