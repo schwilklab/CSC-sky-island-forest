@@ -50,4 +50,4 @@ CNleaves[is.na(CNleaves$area),]$area <- CNleaves[is.na(CNleaves$area),]$needle.a
 CNleaves$LMA <- CNleaves$mass / CNleaves$area
 
 
-ggplot(subset(CNleaves, aes(spcode, LMA)) + geom_boxplot()
+ggplot(CNleaves, aes(spcode, LMA) ) + geom_boxplot()
