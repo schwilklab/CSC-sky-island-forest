@@ -6,5 +6,5 @@ lon,numeric,degrees,"Longitude in decimal degrees, Spheroid WGS84"
 DBH,numeric,cm,Diameter at breast height of main stem
 stem.collected,string,,"YES= stem collected for hydraulics, empty=no stem collected"
 mtn,string,,"Mountain range. CM=Chisos, DM=Davis, GM=Guadalupes"
-area,string,,"Region, trail or trailhead"
+trail.area,string,,"Region, trail or trailhead"
 notes,string,,Any additional notes
