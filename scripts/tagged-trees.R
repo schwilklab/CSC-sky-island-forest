@@ -23,16 +23,19 @@ ddply(trees, .(mtn, spcode), summarize, count = length(tag))
 ## Check  leaf data for missing values, etc
 CNleaves <- read.csv("../data/leaves/CN-leaves.csv", stringsAsFactors=FALSE)
 pines <- read.csv("../data/leaves/CN-leaves-pines-dimensions.csv", stringsAsFactors=FALSE)
+pines.special <-read.csv("../data/leaves/CN-leaves-pines-dimensions-special-cases.csv", stringsAsFactors=FALSE)
+
 
 have.area <- subset(CNleaves,  ! is.na(area))$tag
 have.area.pines <- unique(pines$tag[! is.na(pines$diam1)])
+have.area.pines <- c(have.area.pines, unique(pines.special$tag[! is.na(pines.special$diam1)]))
 have.area <- c(have.area, have.area.pines)
 ## missing areas?
 subset(trees, ! tag %in% have.area)[,c(1,2,7,9)]
 
 ## missing or duplicated masses?
-have.mass <- have.area <- subset(CNleaves,  ! is.na(mass))$tag
-have.mass[duplicated(have.mass)] # 2 dupes
+have.mass <- subset(CNleaves,  ! is.na(mass))$tag
+have.mass[duplicated(have.mass)] # 1 dupes
 subset(trees, ! tag %in% have.mass)[,c(1,2,7,9)]
 
 # missing mass but have area:
