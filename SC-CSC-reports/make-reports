@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 for i in *.md ; do
-    pandoc -f markdown_github -t html $i -o $i.html --standalone
-    pandoc -f markdown_github -t latex $i -o $i.tex --standalone
-    pdflatex $i.tex
+    pandoc -r markdown_github -s -S --latex-engine=pdflatex  $i -o $i.pdf
+    pandoc -r markdown_github -s -S $i -o $i.html
+    pandoc -r markdown_github -s -S $i -o $i.odt
 done
-
