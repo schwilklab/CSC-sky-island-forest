@@ -1,0 +1,5 @@
+variable,type,units,description,
+Tray,string,,Packing tray tag,
+Well,string,,Location tag of leaf sample in the tray,
+Tag,string,,Tree tag ,
+mass,numeric,mg,Mass of leaf sample packed in the tray,
