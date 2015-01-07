@@ -1,0 +1,5 @@
+"variable","type","units","description"
+"tray","string",,"Packing tray tag"
+"well","string",,"Location tag of leaf sample in the tray"
+"tag","string",,"Tree tag "
+"mass","numeric","mg","Mass of leaf sample packed in the tray"
