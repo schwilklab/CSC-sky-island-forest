@@ -2,6 +2,7 @@
 
 library(plyr)
 library(ggplot2)
+library(stringr)
 
 trees <- read.csv("../data/tagged_trees.csv", stringsAsFactors=FALSE)
 
@@ -51,3 +52,32 @@ CNleaves$LMA <- CNleaves$mass / CNleaves$area
 
 
 ggplot(CNleaves, aes(spcode, LMA) ) + geom_boxplot()
+
+
+###############################################################################
+## Elemental composition and isotopes
+
+## takes a bit to get the id variables lined up.
+leaves.ec <- read.csv("../data/leaves/elemental-analysis-raw.csv")
+
+locations <- data.frame(str_match(leaves.ec$file.name,
+                                  "schwilk([0-9]+) ([a-h][0-9]{2})")[,2:3])
+names(locations) <- c("tray", "well")
+leaves.ec <- cbind(locations, leaves.ec)
+rm(locations)
+
+
+leaves.wells <- read.csv("../data/leaves/CN-leaves-trays-wells.csv")
+locations <- str_match(leaves.wells$well, "([A-G])([0-9]+)")
+leaves.wells$well <- paste(tolower(locations[,2]),
+                           sprintf("%02d", as.integer(locations[,3])),
+                           sep="")
+leaves.wells$tray <- str_match(leaves.wells$tray, "Schwilk-([0-9]+)")[,2]
+
+## ok, all lined up, merge!
+leaves.ec <- merge(leaves.wells, leaves.ec)
+CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all.x=TRUE)
+
+
+ggplot(CNleaves, aes(spcode, DisplayDelta1.13C) ) + geom_boxplot()
+
