@@ -38,7 +38,7 @@ doDataChecks <-  function() {
     ## missing or duplicated masses?
     have.mass <- subset(CNleaves,  ! is.na(mass))$tag
     have.mass[duplicated(have.mass)] # 1 dupes
-    print("Trees missing or duplciated leaf dry mass:")
+    print("Trees missing or duplicated leaf dry mass:")
     subset(trees, ! tag %in% have.mass)[,c(1,2,7,9)]
 
     # missing mass but have area:

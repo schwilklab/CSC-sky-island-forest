@@ -51,7 +51,7 @@ CNleaves[is.na(CNleaves$area),]$area <- CNleaves[is.na(CNleaves$area),]$needle.a
 CNleaves$LMA <- CNleaves$mass / CNleaves$area
 
 
-ggplot(CNleaves, aes(spcode, LMA) ) + geom_boxplot()
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU")w, aes(spcode, LMA) ) + geom_boxplot()
 
 
 ###############################################################################
@@ -76,8 +76,16 @@ leaves.wells$tray <- str_match(leaves.wells$tray, "Schwilk-([0-9]+)")[,2]
 
 ## ok, all lined up, merge!
 leaves.ec <- merge(leaves.wells, leaves.ec)
-CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all.x=TRUE)
+CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all = TRUE)
 
 
-ggplot(CNleaves, aes(spcode, DisplayDelta1.13C) ) + geom_boxplot()
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, R_1EC.N15) ) + geom_boxplot()
+
+
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point() + geom_smooth(method="lm", se=FALSE, aes(group=spcode))
+
+
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point()  + facet_grid(. ~ mtn)
+
+
 
