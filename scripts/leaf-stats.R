@@ -51,7 +51,7 @@ CNleaves[is.na(CNleaves$area),]$area <- CNleaves[is.na(CNleaves$area),]$needle.a
 CNleaves$LMA <- CNleaves$mass / CNleaves$area
 
 
-ggplot(subset(CNleaves, substr(spcode,1,2) == "QU")w, aes(spcode, LMA) ) + geom_boxplot()
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, LMA) ) + geom_boxplot()
 
 
 ###############################################################################
@@ -75,7 +75,7 @@ leaves.wells$well <- paste(tolower(locations[,2]),
 leaves.wells$tray <- str_match(leaves.wells$tray, "Schwilk-([0-9]+)")[,2]
 
 ## ok, all lined up, merge!
-leaves.ec <- merge(leaves.wells, leaves.ec)
+leaves.ec1 <- merge(leaves.wells, leaves.ec)
 CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all = TRUE)
 
 
@@ -87,5 +87,10 @@ ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N1
 
 ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point()  + facet_grid(. ~ mtn)
 
+
+# isotopes
+# differences between oaks looks interesting.
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, DisplayDelta1.13C, color=spcode) ) + geom_point()  + facet_grid(. ~ mtn)
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, DisplayDelta1.13C) ) + geom_boxplot()
 
 
