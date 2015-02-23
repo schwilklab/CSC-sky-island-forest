@@ -78,12 +78,12 @@ leaves.wells$tray <- str_match(leaves.wells$tray, "Schwilk-([0-9]+)")[,2]
 leaves.ec <- merge(leaves.wells, leaves.ec, all.x=TRUE)
 CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all = TRUE)
 
-ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, R_1EC.N15) ) + geom_boxplot()
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, N.perc) ) + geom_boxplot()
 
+ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA,  N.perc, color=spcode) ) +
+    geom_point() +
+    geom_smooth(method="lm", se=FALSE, aes(group=spcode))
 
-ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point() + geom_smooth(method="lm", se=FALSE, aes(group=spcode))
-
-ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point()  + facet_grid(. ~ mtn)
 
 
 
