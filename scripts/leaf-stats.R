@@ -58,7 +58,7 @@ ggplot(subset(CNleaves, substr(spcode,1,2) == "QU")w, aes(spcode, LMA) ) + geom_
 ## Elemental composition and isotopes
 
 ## takes a bit to get the id variables lined up.
-leaves.ec <- read.csv("../data/leaves/elemental-analysis-raw.csv")
+leaves.ec <- read.csv("../data/leaves/elemental-analysis-raw.csv", stringsAsFactors=FALSE)
 
 locations <- data.frame(str_match(leaves.ec$file.name,
                                   "schwilk([0-9]+) ([a-h][0-9]{2})")[,2:3])
@@ -67,23 +67,21 @@ leaves.ec <- cbind(locations, leaves.ec)
 rm(locations)
 
 
-leaves.wells <- read.csv("../data/leaves/CN-leaves-trays-wells.csv")
-locations <- str_match(leaves.wells$well, "([A-G])([0-9]+)")
+leaves.wells <- read.csv("../data/leaves/CN-leaves-trays-wells.csv", stringsAsFactors=FALSE)
+locations <- str_match(leaves.wells$well, "([A-H])([0-9]+)")
 leaves.wells$well <- paste(tolower(locations[,2]),
                            sprintf("%02d", as.integer(locations[,3])),
                            sep="")
 leaves.wells$tray <- str_match(leaves.wells$tray, "Schwilk-([0-9]+)")[,2]
 
 ## ok, all lined up, merge!
-leaves.ec <- merge(leaves.wells, leaves.ec)
+leaves.ec <- merge(leaves.wells, leaves.ec, all.x=TRUE)
 CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all = TRUE)
-
 
 ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(spcode, R_1EC.N15) ) + geom_boxplot()
 
 
 ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point() + geom_smooth(method="lm", se=FALSE, aes(group=spcode))
-
 
 ggplot(subset(CNleaves, substr(spcode,1,2) == "QU"), aes(LMA, R_1EC.C / R_1EC.N15, color=spcode) ) + geom_point()  + facet_grid(. ~ mtn)
 
