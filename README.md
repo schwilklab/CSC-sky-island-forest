@@ -20,6 +20,10 @@ The tree tag numbers, latitude and longitude, etc are stored in data/tagged_tree
 
 From each tagged tree we collected ~10 sun leaves.  Five of these were designated "CN leaves" for C:N analysis.  The total area and dry mass of these leaves are both stored in data/leaves/CN-leaves.csv with one row per tagged tree. From these data we will calculate LMA. Note that areas are missing for all pines in this file. For pines, we did not use porjected area but instead measured fascicle diameter and needle length.  These data are in CN-leaves-pines-dimensions.csv with one row per fascicle.  We will summarize these dimensions per tagged tree to calculate equivalent area.
 
+The elemental composition data require 2 files: `data/leaves/elemental-analysis-raw.csv` which gives isotope and percentage N and C by tray and well and CN-leaves-trays-wells.csv which is a lookup table from tray and well to tree tag number.
+
+See `scripts/leaf-data-clean.R` for code for cleaning and merging the data for all summer 2014 leaves. The result, CNleaves (a dataframe) contains the locations, species codes, mass and area for LMA, and elemental analysis data on every tree.  `scripts/leaf-stats.R` produces figures and conducts statistical analyses.
+
 
 ### Conductance data ###
 
