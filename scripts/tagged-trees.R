@@ -30,9 +30,15 @@ doDataChecks <-  function() {
     #print("trees without protein data")
     #trees[! trees$tag %in% protein$tag ,1:2]
 
-    print("oaks without protein data")
+    print("Unmatched protein leaves tags:")
+    print(protein$tag[! protein$tag %in% trees$tag])
+
+    print("oaks without protein data:")
     print(subset(trees[! trees$tag %in% protein$tag ,c(1,2,7)], substr(spcode,1,2) == "QU"))
 
+    print("Mismatched spcode between protein leaves and tagged trees data")
+    temp <- merge(trees, protein, by = "tag")
+    print(subset(temp, spcode != species )[, c("tag", "spcode", "species", "mtn")])
 
     have.area <- subset(CNleaves,  ! is.na(area))$tag
     have.area.pines <- unique(pines$tag[! is.na(pines$diam1)])
