@@ -91,3 +91,8 @@ simpleCurve <-function(thetag) {
     return(p)
 }
 
+
+# check data, replication
+ddply(treecurves, .(mtn, spcode), summarize, N = length(unique(tag)))
+ddply(treecurves, .(spcode), summarize, N = length(unique(tag)))
+      
