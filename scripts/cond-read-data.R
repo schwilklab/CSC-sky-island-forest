@@ -60,7 +60,7 @@ treecurves <- merge(curves, stems, by.x = c("date.collected", "tag", "spcode"), 
 # spot, or merge on spcode
 #names(resprouts)[5] <- "spcode"
 #treecruves <- subset(treecurves, Use) # only keep stems marked for use
-treecurves$tag <- factor(treecurves$tag)
+#treecurves$tag <- factor(treecurves$tag)
 
 # merge in pretty names
 # check
@@ -92,7 +92,12 @@ simpleCurve <-function(thetag) {
 }
 
 
+treesNoCurves <- function(tmtn) {
+    subset(taggedtrees, (! tag %in% treecurves$tag) & (mtn == tmtn ) )
+}
+
+
 # check data, replication
 ddply(treecurves, .(mtn, spcode), summarize, N = length(unique(tag)))
 ddply(treecurves, .(spcode), summarize, N = length(unique(tag)))
-      
+
