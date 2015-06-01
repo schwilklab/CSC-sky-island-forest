@@ -9,10 +9,11 @@ setwd("./data/leaves")
 
 # import file
 proData <- read.csv("leaf-protein.csv", stringsAsFactors=T, strip.white=T)
-
+taggedTrees <- read.csv("CSC-sky-island-forest/data/tagged_trees.csv")
 
 # remove the pines
 proData <- subset(proData, notes!="PINES")
+proData <- subset(proData, notes!="Bad run. Toss")
 
 # calculate average absorbances plus sd
 
@@ -30,6 +31,13 @@ proData$ug.ml <- (((proData$A595.total-0.0025)/0.0015)*5)/proData$vol.supernaten
 
 proData$ug.cm2 <- proData$ug.ml/proData$pair.area
 
+# check for duplicate samples
+
+count(proData$tag)
+
+# merge in mountain range data
+
+proDataM <- merge(proData, taggedTrees, by="tag")
 
 # now doing some exploration
 # note:  I have no idea what tag goes with what mountain range.  So this is 
@@ -38,18 +46,15 @@ proData$ug.cm2 <- proData$ug.ml/proData$pair.area
 # check for NA
 list(proData$ug.cm2)
 
-# removing numbers that are too low right now
 
-proData2 <- subset(proData, ug.cm2>50)
-redo <-subset(proData, ug.cm2<=50)
 # find means and sd for species
 
-proMean <- ddply(proData2, .(species), summarize,
+proMean <- ddply(proDataM, .(species, mtn), summarize,
                  protein_sd=sd(ug.cm2),
                  protein=mean(ug.cm2))
 
 # plot protein levels as ug/cm^2
-ggplot(proMean, aes(species, protein)) +
+ggplot(proMean, aes(species, protein, shape=mtn)) +
   geom_pointrange(aes(ymin=protein-protein_sd, ymax=protein+protein_sd)) +
   labs(y = "protein ug protein / cm^2")
 
