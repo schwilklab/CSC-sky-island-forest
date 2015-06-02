@@ -1,12 +1,9 @@
 # resprouts-vs-adults-2013.R
 
-# Script to run analyses and create figures for Tailor's 2013 conductivity data
-
-# Authors: Dylan Schwilk Tailor Brown
+# Read conductance data for 2014-2015 CSC trees
 
 library(reshape2)
 library(ggplot2)
-#library(stringr)
 library(lubridate)
 
 # read in library for calculations and curves
@@ -73,31 +70,14 @@ treecurves <- curveCalcs(treecurves)
 write.csv(treecurves, "../results-plots/scs-trees-2014-with-curve-calcs.csv", row.names=FALSE)
 
 
-###############################################################################
-# Vulnerability curves
-###############################################################################
-
-# fucntion to make a single curve for whatever tag number we want
-simpleCurve <-function(thetag) {
-    data <- subset(treecurves, tag == thetag)
-    p <- ggplot(data, aes(psi.real, PLC)) +
-         theme_bw() + themeopts +
-         geom_point() +
-         geom_smooth(size=1, span=0.9) +
-         scale_y_continuous("Percent Loss Conductivity", limits=c(-0.1,1.1)) +
-         scale_x_continuous("Xylem tension (MPa)") +
-         facet_grid(display.name ~ .)
-
-    return(p)
-}
-
+# data checks
 
 treesNoCurves <- function(tmtn) {
-    subset(taggedtrees, (! tag %in% treecurves$tag) & (mtn == tmtn ) )
+    subset(taggedtrees, (! tag %in% subset(treecurves, se)$tag) & (mtn == tmtn ) )
 }
 
 
 # check data, replication
-ddply(treecurves, .(mtn, spcode), summarize, N = length(unique(tag)))
+ddply(subset(treecurves, Use), .(mtn, spcode), summarize, N = length(unique(tag)))
 ddply(treecurves, .(spcode), summarize, N = length(unique(tag)))
 

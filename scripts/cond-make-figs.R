@@ -3,12 +3,9 @@
 # clear all objects
 rm(list=ls()) 
 
-# first read in the current data. All file names ahrdcoded in the file below.
+# first read in the current data. All file names hardcoded in the file below.
 # This also sources hydro.R
 source("./cond-read-data.R")
-
-
-
 
 
 ########################################################################################
