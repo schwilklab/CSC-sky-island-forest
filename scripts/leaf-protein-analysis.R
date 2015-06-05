@@ -54,7 +54,7 @@ proMean <- ddply(proDataM, .(species, mtn), summarize,
                  protein=mean(ug.cm2))
 
 # plot protein levels as ug/cm^2
-ggplot(proMean, aes(species, protein, shape=mtn)) +
+ggplot(proMean, aes(species, protein, shape=mtn, color=mtn)) +
   geom_pointrange(aes(ymin=protein-protein_sd, ymax=protein+protein_sd)) +
   labs(y = "protein ug protein / cm^2")
 
