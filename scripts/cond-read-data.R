@@ -73,7 +73,7 @@ write.csv(treecurves, "../results-plots/scs-trees-2014-with-curve-calcs.csv", ro
 # data checks
 
 treesNoCurves <- function(tmtn) {
-    subset(taggedtrees, (! tag %in% subset(treecurves, se)$tag) & (mtn == tmtn ) )
+    subset(taggedtrees, (! tag %in% subset(treecurves, Use)$tag) & (mtn == tmtn ) )
 }
 
 
@@ -81,3 +81,4 @@ treesNoCurves <- function(tmtn) {
 ddply(subset(treecurves, Use), .(mtn, spcode), summarize, N = length(unique(tag)))
 ddply(treecurves, .(spcode), summarize, N = length(unique(tag)))
 
+# write.csv(CMtnc, "../results-plots/CM-trees-no-curves.csv", row.names=FALSE)
