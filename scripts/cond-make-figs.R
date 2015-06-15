@@ -18,7 +18,7 @@ names(plc50s) <- c("plc50","display.name")
 #plc50s$species.code <- reorder(plc50s$species.code,plc50s$plc50)
 
 # By species with PLC50 lines
-p <- ggplot(treecurves, aes(psi.real, PLC)) +
+p <- ggplot(treecurves, aes(psi.real, fc.PLC)) +
     theme_bw() + themeopts +
     geom_point() +
     geom_smooth(size=1, span=0.9) +
