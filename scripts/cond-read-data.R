@@ -49,10 +49,11 @@ curves$date.spun <- mdy(curves$date.spun)
 taggedtrees <- read.csv("../data/tagged_trees.csv",
                         stringsAsFactors=FALSE)
 taggedtrees$date <- mdy(taggedtrees$date)
-#stems <- merge(stems, taggedtrees)
-stems <- taggedtrees
+stems <- read.csv("../data/conductance/csc-trees-stems.csv", stringsAsFactors=FALSE)
+stems$date.collected <- mdy(stems$date.collected)
+treecurves <- merge(curves, stems, by = c("date.collected", "tag", "spcode"))
 
-treecurves <- merge(curves, stems, by.x = c("date.collected", "tag", "spcode"), by.y = c("date", "tag", "spcode"))
+
 # fix spcode.x, spcode.y after merge. TODO: fix this! only need spcode in one
 # spot, or merge on spcode
 #names(resprouts)[5] <- "spcode"
@@ -63,8 +64,9 @@ treecurves <- merge(curves, stems, by.x = c("date.collected", "tag", "spcode"), 
 # check
 species <- read.csv("../species.csv")
 treecurves <- merge(treecurves, species)
+treecurves <- merge(treecurves, taggedtrees, by = c("tag", "spcode"))
 
-# to the curve calculations:
+# to the curve calculations
 treecurves <- curveCalcs(treecurves)
 
 write.csv(treecurves, "../results-plots/scs-trees-2014-with-curve-calcs.csv", row.names=FALSE)
