@@ -30,6 +30,18 @@ p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
 
 ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
 
+# By tag and species with PLC50 lines 2015 only
+p <- ggplot(subset(treecurves, date.collected > mdy("5/1/2015")), aes(psi.real, fc.PLC, color=spcode)) +
+    theme_bw() + themeopts +
+    geom_point() +
+    geom_smooth(size=1, span=0.9) +
+    scale_y_continuous("Percent Loss Conductivity", limits=c(-0.1,1.1)) +
+    scale_x_continuous("Xylem tension (MPa)") +
+    facet_wrap(~ tag) 
+p
+#p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
+
+ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
 
 
 ###############################################################################
