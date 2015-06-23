@@ -10,6 +10,13 @@ library(lubridate)
 # NOTE: set working dir to dir of the current file!
 source("./hydro.R")
 
+# Cleans up any 2 digit dates which should be in 21st century, not first
+# century AD
+fixDates <- function(x) {
+    year(x)[x < mdy("1/1/2000")] <- year(x[x < mdy("1/1/2000")])  + 2000
+    return(x)
+}
+
 ## theme
  textsize <- 16
  stextsize <- 14
@@ -43,15 +50,18 @@ curves <- read.csv("../data/conductance/csc-trees-curves.csv",
 curves$date.collected <- mdy(curves$date.collected)
 curves$date.spun <- mdy(curves$date.spun)
 
-#stems <- read.csv("../data/conductance/csc-trees-stems.csv",
-#                            stringsAsFactors=FALSE)
+# fix 2 letter years, eg "1/1/14" did not occur in AD 14
+curves$date.collected <- fixDates(curves$date.collected)
+curves$date.spun <- fixDates(curves$date.spun)
+
 
 taggedtrees <- read.csv("../data/tagged_trees.csv",
                         stringsAsFactors=FALSE)
 taggedtrees$date <- mdy(taggedtrees$date)
+
 stems <- read.csv("../data/conductance/csc-trees-stems.csv", stringsAsFactors=FALSE)
 stems$date.collected <- mdy(stems$date.collected)
-treecurves <- merge(curves, stems, by = c("date.collected", "tag", "spcode"))
+treecurves <- merge(curves, stems, by = c("date.collected", "tag"), all.x=TRUE)#, "spcode"))
 
 
 # fix spcode.x, spcode.y after merge. TODO: fix this! only need spcode in one
@@ -64,12 +74,12 @@ treecurves <- merge(curves, stems, by = c("date.collected", "tag", "spcode"))
 # check
 species <- read.csv("../species.csv")
 treecurves <- merge(treecurves, species)
-treecurves <- merge(treecurves, taggedtrees, by = c("tag", "spcode"))
+treecurves <- merge(treecurves, taggedtrees, by = c("tag", "spcode"), all.x=TRUE)
 
 # to the curve calculations
 treecurves <- curveCalcs(treecurves)
 
-write.csv(treecurves, "../results-plots/scs-trees-2014-with-curve-calcs.csv", row.names=FALSE)
+write.csv(treecurves, "../results-plots/treecurves.csv", row.names=FALSE)
 
 
 # data checks
