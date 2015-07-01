@@ -66,7 +66,7 @@ treecurves <- merge(curves, stems, by = c("date.collected", "tag"), all.x=TRUE)#
 
 # fix spcode.x, spcode.y after merge. TODO: fix this! only need spcode in one
 # spot, or merge on spcode
-#names(resprouts)[5] <- "spcode"
+names(treecurves)[5] <- "spcode"
 #treecruves <- subset(treecurves, Use) # only keep stems marked for use
 #treecurves$tag <- factor(treecurves$tag)
 
