@@ -17,32 +17,12 @@ fixDates <- function(x) {
     return(x)
 }
 
-## theme
- textsize <- 16
- stextsize <- 14
- themeopts <- theme_bw() +
-    theme(panel.border = element_rect(colour = 'gray15', size=1.5),
-    panel.background = element_blank(),
-    panel.grid = element_blank(),
-    # strip.background = element_rect(colour = 'gray15', size=1.5, fill="gray95"),
-    axis.title.y = element_text(size = textsize, angle = 90),
-    axis.title.x = element_text(size = textsize),
-    strip.text.x = element_text(size = textsize),
-    strip.text.y = element_text(size = stextsize),
-    axis.text.x  = element_text(size = stextsize, colour="gray15"),
-    axis.text.y  = element_text(size = stextsize, colour="gray15")
-    )
-
 ### find plc50
 plc50 <- function(modx) {
   x <- seq(0,-6,-0.01)
   y <- predict(modx,newdata = x)
   return(x[which.min(abs(y-0.5))])
 }
-
-############################################
-## Quick curves only
-############################################
 
 ## Read in curves file and stems file
 curves <- read.csv("../data/conductance/csc-trees-curves.csv",
@@ -63,6 +43,10 @@ stems <- read.csv("../data/conductance/csc-trees-stems.csv", stringsAsFactors=FA
 stems$date.collected <- mdy(stems$date.collected)
 treecurves <- merge(curves, stems, by = c("date.collected", "tag"), all.x=TRUE)#, "spcode"))
 
+# Check the spcodes match (tagged trees and stems file)
+
+## stopifnot(all(treecurves$spcode.x == treecurves$spcode.y))
+## ddply(subset(treecurves, (spcode.x != spcode.y) | is.na(spcode.y)), .(tag, spcode.x, spcode.y, date.collected), summarize, nchar(spcode.x[1]), nchar(spcode.y[1]))
 
 # fix spcode.x, spcode.y after merge. TODO: fix this! only need spcode in one
 # spot, or merge on spcode
