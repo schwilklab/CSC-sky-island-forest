@@ -1,12 +1,18 @@
-# R code to make xylem vulnerability figures
+# Code to run xylem vulnerability curve stats and make figures
 
 # clear all objects
 rm(list=ls()) 
-
 # first read in the current data. All file names hardcoded in the file below.
 # This also sources hydro.R
 source("./cond-read-data.R")
 source("./weibull.R") # Reparameterized Weibull curves
+
+### find plc50
+plc50 <- function(modx) {
+  x <- seq(0,-6,-0.01)
+  y <- predict(modx,newdata = x)
+  return(x[which.min(abs(y-0.5))])
+}
 
 ## The ggplot theme for all figures.
 bestfit <- geom_smooth(method="lm",se = F, color = "black", size=1.5)
