@@ -7,6 +7,8 @@ rm(list=ls())
 source("./cond-read-data.R")
 source("./weibull.R") # Reparameterized Weibull curves
 
+library(reshape2)
+
 ### find plc50
 plc50 <- function(modx) {
   x <- seq(0,-6,-0.01)
