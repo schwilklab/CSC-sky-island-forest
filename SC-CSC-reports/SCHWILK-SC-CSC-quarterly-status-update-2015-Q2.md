@@ -46,18 +46,19 @@ This project contributed to the education of 5 undergraduate or recent graduate 
 | Xiulin Gao      | graduate    |     22-26 | RA             |
 | Erik Lindberg   | graduate    |     22-26 | RA             |
 
-List significant expenditures during this quarter
+List significant expenditures during this quarter (most have no fully posted)
 
-| Type                                                                                  | Expense |
-| ------------------------------------                                                  | ------- |
-| Salaries and labor                                                                    |         |
-| Supplies and replacement parts                                                        |         |
-|                                                                                       |         |
-| Field site travel (fuel has not been charged yet)                                     |         |
-|                                                                                       |         |
+| Type                                 | Expense |
+| ------------------------------------ | ------- |
+| PI Salaries and fringe               |   10383 |
+| Undergraduate labor and fringe       |    3100 |
+| Supplies and replacement parts       |     300 |
+| Field site travel                    |     650 |
+| Graduate RAs                         |    4700 |
+|                                      |         |
 
 
-Total expenses: $
+Total expenses: $19133.  Some of these numbers are not final as getting my students paid correctly has been a nightmare at TTU.  I am estimating what the final costs should be.
 
 ## Interim results / deliverables: ##
 
