@@ -53,10 +53,10 @@ treecurves$spcode.y <- NULL
 treecurves <- plyr::rename(treecurves, c("notes.x" = "notes.stem", "notes.y" = "notes.curve"))
 
 ###############################################################################
-## Do vulnerbaility curve calculations
+## Do vulnerability curve calculations
 ###############################################################################
 
-## TODO: use correct pipette correction depnding on date (we changed reservoirs
+## TODO: use correct pipette correction depending on date (we changed reservoirs
 ## in summer 2015).
 treecurves <- curveCalcs(treecurves)
 
@@ -77,8 +77,22 @@ stopifnot(all(treecurves$spcode.x == treecurves$spcode.y))
 names(treecurves)[3] <- "spcode"
 treecurves$spcode.y <- NULL
 
+
+# create column for triat
+treecurves$tag.date <- paste(treecurves$tag, "." , treecurves$date.collected, sep="")
+
+## remove faulty runs
+badtags <- c("1001", "1002", "1004", "1008", "1016", "1017", "1018", "1019", "1020", "1051",
+             "1053", "1056", "1101", "1102", "1111", "1136", "1137", "1139", "1140", "1210",
+             "1211", "1220", "1221", "1257", "1259", "12XXE", "12XXE2", "12XXE3", "256",
+             "501", "901", "P3307")
+
+treecurves <- subset(treecurves, ! tag %in% badtags)
+
+
+
 ###############################################################################
-## Final cleaning, remove temprary columns and variables
+## Final cleaning, remove temporary columns and variables
 ###############################################################################
 
 # merge in full species names according to USDA species code
