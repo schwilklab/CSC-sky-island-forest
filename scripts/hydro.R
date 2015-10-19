@@ -117,5 +117,6 @@ curveCalcs <- function(df, getKstem = FALSE, getKLeaf =FALSE) {
    # MPa:
    df <- ddply(df, .(tag, date.collected, flushed), transform,
                fc.PLC = 1.0 - K / K[closest(psi.real, -0.25)] )
+   df$fc.PLCp <- df$fc.PLC * 100
    return(df)
  }
