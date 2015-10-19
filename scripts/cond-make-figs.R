@@ -48,8 +48,9 @@ plc50s$tag <- sapply(strsplit(as.character(plc50s$tag.date), ".", fixed=TRUE), f
 plc50s <- merge(plc50s, taggedtrees, by = c("tag"), all.x=TRUE)
 #plc50s$species.code <- reorder(plc50s$species.code,plc50s$plc50)
 
-ggplot(subset(plc50s, plc50 > -12), aes(spcode, plc50)) + geom_boxplot()
-
+ggplot(subset(plc50s, plc50 > -12 & spcode != "QUEM" & spcode != "JUPI"),
+       aes(spcode, plc50)) + geom_boxplot()
+ggsave("../results-plots/plc50-by-species.pdf")
 
 
 # By species with PLC50 lines
