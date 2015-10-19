@@ -9,13 +9,6 @@ source("./weibull.R") # Reparameterized Weibull curves
 
 library(reshape2)
 
-### find plc50
-plc50 <- function(modx) {
-  x <- seq(0,-6,-0.01)
-  y <- predict(modx,newdata = x)
-  return(x[which.min(abs(y-0.5))])
-}
-
 ## The ggplot theme for all figures.
 bestfit <- geom_smooth(method="lm",se = F, color = "black", size=1.5)
 textsize <- 12
@@ -47,10 +40,17 @@ themeopts <-   theme(axis.title.y = element_text(family=fontfamily,
 
 ########################################################################################
 # Quick curves by individuals
-models <- dlply(treecurves, "display.name", function(df) loess(PLC ~ psi.real, data = df))
-plc50s <- melt(lapply(models, plc50))
-names(plc50s) <- c("plc50","display.name")
+models <- dlply(treecurves, "tag.date", fitweibull) #function(df) loess(PLC ~ psi.real, data = df))
+                
+plc50s <- melt(lapply(models, function(x) {coef(x)[1]}))
+names(plc50s) <- c("plc50","tag.date")
+plc50s$tag <- sapply(strsplit(as.character(plc50s$tag.date), ".", fixed=TRUE), function(x) x[1])
+plc50s <- merge(plc50s, taggedtrees, by = c("tag"), all.x=TRUE)
 #plc50s$species.code <- reorder(plc50s$species.code,plc50s$plc50)
+
+ggplot(subset(plc50s, plc50 > -12), aes(spcode, plc50)) + geom_boxplot()
+
+
 
 # By species with PLC50 lines
 p <- ggplot(treecurves, aes(psi.real, fc.PLC)) +
@@ -60,13 +60,13 @@ p <- ggplot(treecurves, aes(psi.real, fc.PLC)) +
     scale_y_continuous("Percent Loss Conductivity", limits=c(-0.1,1.1)) +
     scale_x_continuous("Xylem tension (MPa)") +
     facet_grid(display.name ~ .) 
-
-p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
+p
+#p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
 
 ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
 
 # By tag and species with PLC50 lines 2015 only
-p <- ggplot(subset(treecurves, date.collected > mdy("5/1/2015")), aes(psi.real, fc.PLC, color=spcode)) +
+p <- ggplot(treecurves, aes(psi.real, fc.PLC, color=spcode)) +
     theme_bw() + themeopts +
     geom_point() +
     geom_smooth(size=1, span=0.9) +
