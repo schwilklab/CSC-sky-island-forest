@@ -4,12 +4,9 @@
 library(plyr)
 library(ggplot2)
 
-# set directory to the leaves data
-setwd("./data/leaves")
-
 # import file
-proData <- read.csv("leaf-protein.csv", stringsAsFactors=T, strip.white=T)
-taggedTrees <- read.csv("CSC-sky-island-forest/data/tagged_trees.csv")
+proData <- read.csv("../data/leaves/leaf-protein.csv", stringsAsFactors=T, strip.white=T)
+taggedTrees <- read.csv("../data/tagged_trees.csv")
 
 # remove the pines
 proData <- subset(proData, notes!="PINES")
