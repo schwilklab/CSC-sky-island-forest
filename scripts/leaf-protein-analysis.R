@@ -1,58 +1,55 @@
-## exploring protein data 
-# E.F. Waring
+# Read and clean leaf protein data
+# E.F. Waring, Dylan Schwilk
 
-library(plyr)
-library(ggplot2)
+library(dplyr)
+
+source("./leaf-data-clean.R") # provides two data frames: CNLeaves and trees
+
+###############################################################################
+## Leaf protein data (oaks only)
+###############################################################################
 
 # import file
-proData <- read.csv("../data/leaves/leaf-protein.csv", stringsAsFactors=T, strip.white=T)
-taggedTrees <- read.csv("../data/tagged_trees.csv")
+protein <- read.csv("../data/leaves/leaf-protein.csv", stringsAsFactors=FALSE, strip.white=TRUE)
 
-# remove the pines
-proData <- subset(proData, notes!="PINES")
-proData <- subset(proData, notes!="Bad run. Toss")
+protein.raw <- protein %>% subset(notes != "PINES") %>%
+    mutate(A595 = (A595.1 + A595.2 + A595.3) / 3.0, # average absorbances
+           # calculate ug of protein per mL solution we dilute the extract by 5
+           # folds so we need to multiple protein by 5 all other numbers from
+           # standard curve by EFW
+           prot.ug.ml = (((A595 - 0.0025) / 0.0015) * 5) / vol.supernatent, 
+           prot.ug.cm2 = prot.ug.ml / pair.area, # protein per cm^2 tissue
+           prot.LMA = pair.dry.mass / pair.area,
+           prot.ug.g =  prot.ug.cm2 * prot.LMA # protein per dry mass
+           )
 
-# calculate average absorbances plus sd
-
-proData$A595.total <- (proData$A595.1 +proData$A595.2 +proData$A595.3) / 3
-
-# caluclate ug of protein per mL solution
-# we dilute the extract by 5 folds so we need to multiple protein by 5
-# all other numbers from standard curve by EFW
-
-proData$ug.ml <- (((proData$A595.total-0.0025)/0.0015)*5)/proData$vol.supernatent
-
-
-
-#calculate ug protein per cm^2 tissue
-
-proData$ug.cm2 <- proData$ug.ml/proData$pair.area
+protein <- protein.raw %>% dplyr::select(tag, prot.ug.ml, prot.ug.cm2, prot.LMA, prot.ug.g)
 
 # check for duplicate samples
+# max(count(protein$tag)$freq)
 
-count(proData$tag)
+# merge and create overall leaf data data frame
+leaves <- merge(CNleaves, protein, by="tag", all=TRUE)
 
-# merge in mountain range data
+# Data checks
+ggplot(aes(spcode, prot.LMA), data=subset(leaves, grepl("^QU", spcode))) +
+    geom_boxplot()
+ggsave("../results-plots/protein-lma.png")
 
-proDataM <- merge(proData, taggedTrees, by="tag")
+# so some wierd outliers. Caused by area or mass:
 
-# now doing some exploration
-# note:  I have no idea what tag goes with what mountain range.  So this is 
-# purely on species alone.
-
-# check for NA
-list(proData$ug.cm2)
-
-
-# find means and sd for species
-
-proMean <- ddply(proDataM, .(species, mtn), summarize,
-                 protein_sd=sd(ug.cm2),
-                 protein=mean(ug.cm2))
-
-# plot protein levels as ug/cm^2
-ggplot(proDataM, aes(species, ug.cm2, shape=mtn, color=mtn, position=mtn)) +
-  geom_point() +
-  labs(y = "protein ug protein / cm^2")
+ggplot(aes(pair.dry.mass, pair.wet.mass), data=protein.raw) +
+    geom_point() + facet_grid(. ~ species)
+ggsave("../results-plots/protein-wet-dry-mass.png")
 
 
+p <- ggplot(aes(prot.ug.cm2, prot.ug.g), data=subset(leaves, grepl("^QU", spcode))) +
+    geom_point() +
+    facet_grid(. ~spcode)
+p
+
+
+p <- ggplot(aes(LMA, prot.LMA), data=subset(leaves, grepl("^QU", spcode))) +
+    geom_point() +
+    facet_grid(. ~spcode)
+p

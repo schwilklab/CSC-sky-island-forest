@@ -1,4 +1,6 @@
-# Read leaf mass and areas and elemental composition data, merge with tagged_trees
+# Read leaf mass and areas and elemental composition data, merge with
+# tagged_trees, merge with portein data (oaks only)
+
 
 library(plyr)
 library(stringr)
@@ -88,3 +90,8 @@ CNleaves <- merge(CNleaves, leaves.ec, by = "tag", all = TRUE)
 
 # all we need is CNleaves data frame
 rm(leaves.ec, leaves.wells, locations)
+
+
+# In global namespace: CNLeaves, trees
+
+
