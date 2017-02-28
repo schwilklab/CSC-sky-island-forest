@@ -24,7 +24,6 @@ The elemental composition data require 2 files: `data/leaves/elemental-analysis-
 
 See `scripts/leaf-data-clean.R` for code for cleaning and merging the data for all summer 2014 leaves. The result, CNleaves (a dataframe) contains the locations, species codes, mass and area for LMA, and elemental analysis data on every tree.  `scripts/leaf-stats.R` produces figures and conducts statistical analyses.
 
-
 ### Conductance data ###
 
 Stem conductance data are stored in two files: 
