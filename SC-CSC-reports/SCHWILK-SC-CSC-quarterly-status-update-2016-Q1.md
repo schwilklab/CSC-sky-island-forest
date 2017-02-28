@@ -1,4 +1,4 @@
-Quarterly Status Update:  October - December, 2015
+Quarterly Status Update:  January - March, 2016
 ====================================================
 
 Project Name:  *Predicting Sky Island Forest Vulnerability to Climate Change: Fine Scale Climate Variability, Drought Tolerance, and Fire Response*
@@ -13,42 +13,42 @@ The objectives of this research are to: 1) identify the key functional traits in
 
 ## Work performed during reporting period: ##
 
-1. Helen Poulos computed all DEM-derived topographic variables, but we found some errors and inconsistencies. Schwilk developed set of data quality control scripts and we began recalculating. We have the model fitting working, but now are rechecking the data that feeds the models.
+1. We completed calculations of DEM derived variables
 
-2. Our manuscript submitted to *Plant Ecology* was accepted.
-
-3. We began visiting each mountain range to take down the iButton sensors
+2. We completed dismantling iButton sensors in the Davis Mountains.
 
 
 ## Problems encountered during reporting period: ##
 
-None.
+None
 
 ## Work planned for next reporting period: ##
 
 1. Finish removing iButtons sensors from each mountain range
-2. Finish microclimate models based on topography and local station daily data.
+2. Finish microclimate models based on topography and local station daily data. This will require gradient-forest models on topographic data and nested linear models on temporal component of PCA decomposition.
+3. We repaired and replaced worn out field equipment.
  
 ## Budget expenditures: ##
 
-This project contributed to the education of 5 undergraduate or recent graduate student researchers this quarter, 3 women and 4 from an underrepresented minority (Hispanic/Latino). This, assistantships for two graduate students who worked on the xylem vulnerability curves, and summer salary for Schwilk were the main expenditures.
+This project contributed to the education of 3 undergraduate student researchers this quarter, 1 from an underrepresented minority (Hispanic/Latino).
 
 
-| Name            | Rank        | Age group | Work Status    |
-| --------------- | ----------  | --------- | -------------- |
-| Helen Poulos    | Co PI       |           | Co PI          |
+| Name            | Rank          | Age group | Work Status          |
+| --------------- | ----------    | --------- | --------------       |
+| Kevin Price     | Undergraduate |     19-22 | Research credit      |
+| Ryan PRovencio  | Undergraduate |     19-22 | Research credit      |
+| Jonathan Galvez | Undergraduate |     19-22 | Volunteer technician |
+
 
 List significant expenditures during this quarter.
 
 | Type                                 | Expense |
 | ------------------------------------ | ------- |
-| Field site travel                    |     670 |
-| Materials                            |     167 |
+| Replace worn field gear              |     294 |
 
 
-Total expenses: $837.
+Total expenses: $294.
 
 ## Interim results / deliverables: ##
 
-1. We update the GitHub repository continuously with the raw data and the conductance results: https://github.com/schwilklab/CSC-sky-island-forest
-2. Manuscript accepted: Schwilk, D.W., T.E. Brown, R. Lackey and J. Willms. "Post-fire resprouting oaks (genus: Quercus) exhibit plasticity in xylem vulnerability to drought." *Plant Ecology*.
+None new.
