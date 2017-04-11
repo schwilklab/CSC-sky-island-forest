@@ -12,8 +12,8 @@ source("./leaf-data-clean.R") # provides two data frames: CNLeaves and trees
 # import file
 protein <- read.csv("../data/leaves/leaf-protein.csv", stringsAsFactors=FALSE, strip.white=TRUE)
 
-protein.raw <- protein %>% subset(notes != "PINES") %>%
-    mutate(A595 = (A595.1 + A595.2 + A595.3) / 3.0, # average absorbances
+protein.raw <- protein %>% subset(notes != "PINES") %>% rowise() %>%
+    mutate(A595 = mean(c(A595.1,A595.2,A595.3), na.rm=TRUE), # average absorbances
            # calculate ug of protein per mL solution we dilute the extract by 5
            # folds so we need to multiple protein by 5 all other numbers from
            # standard curve by EFW
@@ -32,8 +32,17 @@ protein <- protein.raw %>% dplyr::select(tag, prot.ug.ml, prot.ug.cm2, prot.LMA,
 leaves <- merge(CNleaves, protein, by="tag", all=TRUE)
 
 # Data checks
-ggplot(aes(spcode, prot.LMA), data=subset(leaves, grepl("^QU", spcode))) +
+ggplot(aes(spcode, prot.ug.g, color=spcode), data=subset(leaves, grepl("^QU", spcode))) +
+    geom_jitter()
+ggsave("../results-plots/protein-bymass.png")
+
+ggplot(aes(spcode, prot.ug.cm2), data=subset(leaves, grepl("^QU", spcode))) +
     geom_boxplot()
+ggsave("../results-plots/protein-byarea.png")
+
+
+ggplot(aes(spcode, prot.LMA, color=spcode), data=subset(leaves, grepl("^QU", spcode))) +
+    geom_jitter()
 ggsave("../results-plots/protein-lma.png")
 
 # so some wierd outliers. Caused by area or mass:
