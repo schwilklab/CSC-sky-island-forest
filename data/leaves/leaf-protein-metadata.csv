@@ -1,14 +1,14 @@
-"variable","type","units","description"
-"date","string",,
-"species","string",,"USDA species code. See tagged-trees.csv"
-"tag","string",,"Unique tree tag. This is the individual identifier"
-"weight","numeric","?","?"
-"A595.1","absorbance","?","?"
-"A595.2","absorbance","?","?"
-"A595.3","absorbance","?","?"
-"vol.supernatent","numeric","ml","?"
-"pair.area","numeric","cm^3","Area of paired fresh weight sample for fresh-dry mass area conversions. See methods."
-"pair.wet.mass","numeric","g","Fresh mass of paired sample"
-"pair.dry.date","string",,"Date of dry mass measurement on paired sample"
-"pair.dry.mass","numeric","g","Dry mass of paired leaf sample"
-"notes","string",,"Additional notes"
+variable,type,units,description
+date,string,,
+species,string,,USDA species code. See tagged-trees.csv
+tag,string,,Unique tree tag. This is the individual identifier
+weight,numeric,g,Weight of leaf tissue used in protien extraction
+A595.1,numeric,,The unitless absorbance of light at 595 nm (see Beer's law for more details); done in triplicate to determine if any single measurements were inaccurate
+A595.2,numeric,,The unitless absorbance of light at 595 nm (see Beer's law for more details); done in triplicate to determine if any single measurements were inaccurate
+A595.3,numeric,,The unitless absorbance of light at 595 nm (see Beer's law for more details); done in triplicate to determine if any single measurements were inaccurate
+vol.supernatent,numeric,ml,volume of the supernatent measured after absorbance has been determined. See methods for more details
+pair.area,numeric,cm^3,Area of paired fresh weight sample for fresh-dry mass area conversions. See methods.
+pair.wet.mass,numeric,g,Fresh mass of paired sample
+pair.dry.date,string,,Date of dry mass measurement on paired sample
+pair.dry.mass,numeric,g,Dry mass of paired leaf sample
+notes,string,,Additional notes
