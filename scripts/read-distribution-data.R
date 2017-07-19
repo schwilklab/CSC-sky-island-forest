@@ -27,3 +27,11 @@ GM <-read.csv("../data/distribution/GM_plots.csv", stringsAsFactors=FALSE)  %>%
 # intermediates
 distribution_data <- rbind(CM, DM, GM) %>% mutate(presence = IV > 0)
 rm(CM, DM, GM)
+
+library(sp)
+library(rgdal)
+
+
+SP <- SpatialPoints(cbind(669486, 3238340), proj4string = CRS("+proj=utm +zone=13 +datum=NAD83"))
+
+coordsll <- spTransform(SP, CRS("+proj=longlat +datum=WGS84"))
