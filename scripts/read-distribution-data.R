@@ -25,13 +25,17 @@ GM <-read.csv("../data/distribution/GM_plots.csv", stringsAsFactors=FALSE)  %>%
 
 # row bind these up in one data frame, add presence/absence column and delete
 # intermediates
-distribution_data <- rbind(CM, DM, GM) %>% mutate(presence = IV > 0)
+distribution_data <- rbind(CM, DM, GM) %>% mutate(present = IV > 0)
 rm(CM, DM, GM)
 
+# Now correct the latlongs. Data in files has accurate utm coordinates (NAD83)
+# but inaccurate lat lons). See
+# https://github.com/schwilklab/CSC-sky-island-forest/issues/33
 library(sp)
 library(rgdal)
 
+SP <-SpatialPoints(cbind(distribution_data$easting, distribution_data$northing), proj4string = CRS("+proj=utm +zone=13 +datum=NAD83"))
+coordsll <-  as.data.frame(spTransform(SP, CRS("+proj=longlat +datum=WGS84")))
+distribution_data <- mutate(distribution_data, long=coordsll[,1], lat =coordsll[,2])
 
-SP <- SpatialPoints(cbind(669486, 3238340), proj4string = CRS("+proj=utm +zone=13 +datum=NAD83"))
-
-coordsll <- spTransform(SP, CRS("+proj=longlat +datum=WGS84"))
+rm(SP, coordsll)
