@@ -16,17 +16,17 @@ plot_data_to_long <- function(df) {
 
 # read each mtn range file and convert to long format adding column for mtn
 # identifier
-CM <-read.csv("../data/distribution/CM_plots.csv", stringsAsFactors=FALSE) %>%
+CM_dist <-read.csv("../data/distribution/CM_plots.csv", stringsAsFactors=FALSE) %>%
   mutate(mtn = "CM") %>% plot_data_to_long()
-DM <-read.csv("../data/distribution/DM_plots.csv", stringsAsFactors=FALSE)  %>%
+DM_dist <-read.csv("../data/distribution/DM_plots.csv", stringsAsFactors=FALSE)  %>%
   mutate(mtn = "DM") %>% plot_data_to_long()
-GM <-read.csv("../data/distribution/GM_plots.csv", stringsAsFactors=FALSE)  %>%
+GM_dist <-read.csv("../data/distribution/GM_plots.csv", stringsAsFactors=FALSE)  %>%
   mutate(mtn = "GM") %>% plot_data_to_long()
 
 # row bind these up in one data frame, add presence/absence column and delete
 # intermediates
-distribution_data <- rbind(CM, DM, GM) %>% mutate(present = IV > 0)
-rm(CM, DM, GM)
+distribution_data <- rbind(CM_dist, DM_dist, GM_dist) %>% mutate(present = IV > 0)
+rm(CM_dist, DM_dist, GM_dist)
 
 # Now correct the latlongs. Data in files has accurate utm coordinates (NAD83)
 # but inaccurate lat lons). See
