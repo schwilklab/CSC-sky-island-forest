@@ -1,110 +1,78 @@
-## save script for reference. But DO NOT USE. All SDM code will be moved to
-## CSC-sky-island-forest repo. Thgis script does not run, it refers to
-## nonexistant distirbution files (Feb 2017 versions rather than updated April
-## 2017 versions).
-
+## 
 # Base script by H. Poulos
 
-#library(plotKML)
 library(sp)
-library(maptools)
-library(spatstat)
 library(raster)
 library(rgdal)
+library(dplyr)
 
-CM19612000 <- readRDS("../../skyisland-climate/results/reconstructions/CM____19612000.RDS")
-CM19612000<-data.frame(CM19612000)
-sp::coordinates(CM19612000) <- ~x+y # converts object to "SpatialPointsDataFrame"
-# let's be explicit about projections
-projection(CM19612000) <- CRS("+proj=longlat +ellps=WGS84") 
-CM19612000 <- as(CM19612000, "SpatialPixelsDataFrame")
-# str(CM19612000)
-#if you want to plot object spplot(CM19612000)
+clim_data_2_brick <- function(df) {
+  sp::coordinates(df) <- ~ x + y # converts object to "SpatialPointsDataFrame"
+  #let's be explicit about projections:
+  projection(df) <- CRS("+proj=longlat +ellps=WGS84") 
+  df <- as(df, "SpatialPixelsDataFrame")
+  return <- raster::brick(df)
+}
 
-#make the various BIO rasters for CM19162000
-BIO1<-raster(CM19612000, layer=1)
-summary(BIO1)
+# read all mtn ranges reference period summaries and store each range as a
+# separate raster "brick" (like a raster stack).
+CM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/CM____19612000.RDS"))
+CM <- clim_data_2_brick(CM)
+DM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/DM____19612000.RDS"))
+DM <- clim_data_2_brick(DM)
+GM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/GM____19612000.RDS"))
+GM <- clim_data_2_brick(GM)
 
-BIO2<-raster(CM19612000, layer=2)
-summary(BIO2)
+# we could then merge all of these into a single raster, eg
+# clim_data_all <- merge(CM, DM, tolerance = 1)
+# but I am worried about rounding accuracy. So for now, leave separate raster
+# bricks for each mtn range, but we can always combine extracted locaiton data
+# to run a model on all occurrence locations across all mtn ranges at once. But
+# we will need to run predicitions spearately for each range. I think this is
+# best solution as it allows breaking up the porblem for easier running on
+# workstatons or the computer cluster.
 
-BIO3<-raster(CM19612000, layer=3)
-summary(BIO3)
-
-BIO4<-raster(CM19612000, layer=4)
-summary(BIO4)
-
-BIO5<-raster(CM19612000, layer=5)
-summary(BIO5)
-
-BIO6<-raster(CM19612000, layer=6)
-summary(BIO6)
-
-BIO7<-raster(CM19612000, layer=7)
-summary(BIO7)
-
-BIO8<-raster(CM19612000, layer=8)
-summary(BIO8)
-
-BIO9<-raster(CM19612000, layer=9)
-summary(BIO9)
-
-BIO10<-raster(CM19612000, layer=10)
-summary(BIO10)
-
-BIO11<-raster(CM19612000, layer=11)
-summary(BIO11)
-
-march_may_min<-raster(CM19612000, layer=12)
-summary(march_may_min)
-
-predictors<-stack(BIO1,BIO2,BIO3,BIO4,BIO5,BIO6,BIO7,BIO8,BIO9,BIO10,BIO11,march_may_min)
-names(predictors)
-plot(predictors)
-
-library(dismo)
-
-#bring in species
+# Read species distribution data
 source("./read-distribution-data.R")
-QUGR3 <- distribution_data %>%
-  filter(spcode == "QUGR3" & present & mtn=="CM") %>% select(long, lat)
-head(QUGR3)
-#dim(QUGR3)
-#QUGR3latlon<-data.frame(QUGR3$long,QUGR3$lat)
-coordinates(QUGR3) <- c("long", "lat")
-projection(QUGR3) <- CRS("+proj=longlat +ellps=WGS84") 
-presvals <- raster::extract(predictors, QUGR3) # careful. Must be explicit
-                                               # about which extract function
-                                               # to use
 
-#generate background points from within the mask of BIO1 and plot them
-set.seed(1963)
-mask <- BIO3
-bg <- randomPoints(mask, 100)
-par(mfrow=c(1,2))
-plot(!is.na(mask), legend=FALSE)
-points(bg, cex=0.5)
+# begin example. QUEM in CM
+ QUEM <- distribution_data %>%
+   filter(spcode == "QUEM" & mtn=="CM") %>% select(long, lat, present)
+QUEM_longlat <- select(QUEM, long, lat)
+coordinates(QUEM_longlat) <- ~long+lat
+projection(QUEM_longlat) <- CRS("+proj=longlat +ellps=WGS84") 
+locations <- raster::extract(CM, coordinates(QUEM_longlat)) # careful. Must be explicit
+                                                # about which extract function
+# presence/absence true false
+sdmdata <- mutate(as.data.frame(locations), present = QUEM$present)
 
-absvals <- raster::extract(predictors, bg)
-pb <- c(rep(1, nrow(presvals)), rep(0, nrow(absvals)))
-sdmdata <- data.frame(cbind(pb, rbind(presvals, absvals)))
 
-#SDM models want names in text. Won't work with as.factor specification
 
-sdmdata$pb<- as.factor(sdmdata$pb)
-levels(sdmdata$pb) <- gsub("0", "absent", levels(sdmdata$pb))
-levels(sdmdata$pb) <- gsub("1", "present", levels(sdmdata$pb))
-head(sdmdata)
+# HP: SDM models want names in text. Won't work with as.factor specification
+
+## DWS: I don't get this --- this makes no sense and must refer to some other
+## issue or misunderstanding. Names can't have anything to do with it. WHen we
+## have an issue like this it is important to find root cause and not use a
+## workaround that masks the problem. I suspect the problem is that your code
+## is making assumptions about factor level order somewhere.
+
+## The various models below all work on factors and classify. BUt named fctors
+## are easier to interpret.
+
+
+## sdmdata$pb<- as.factor(sdmdata$pb)
+## levels(sdmdata$pb) <- gsub("0", "absent", levels(sdmdata$pb))
+## levels(sdmdata$pb) <- gsub("1", "present", levels(sdmdata$pb))
+## head(sdmdata)
 
 # pairs plot of the values of the climate data
 # at the species occurrence sites.
   
-pairs(sdmdata[,2:5], cex=0.1, fig=TRUE)
+pairs(sdmdata[,-13], cex=0.1, fig=TRUE)
 
 
 # Fit xgboost: model with 5-fold cross-validation
 library(caret)
-#library(plyr)  ## oo dangerous!  change to dplyr asap
 library(xgboost)
 
 #control set with 5 fold cv and 1 repeat for speed right now. Should change repeats to betweeen 3 and 5 later
@@ -113,7 +81,7 @@ seed <- 7
 metric <- "Accuracy"
 
 set.seed(seed)
-boost <- train(as.factor(pb)~., data=sdmdata, method = 'xgbTree', metric=metric, trControl=control)
+boost <- train(as.factor(present) ~ ., data=sdmdata, method='xgbTree', metric=metric, trControl=control)
 # Print model to console
 boost
 
@@ -125,15 +93,14 @@ boostImp <- varImp(boost, scale=TRUE)
 boostImp
 
 #make the SDM
-Boost <- predict(predictors, boost)
+Boost <- predict(CM, boost)
 plot(Boost)
-
 
 
 # SVM model--support vector machines with radial basis function
 library(kernlab)
 
-svm <- train(as.factor(pb)~., data=sdmdata, method = 'svmRadial', metric=metric, trControl=control)
+svm <- train(as.factor(present)~., data=sdmdata, method = 'svmRadial', metric=metric, trControl=control)
 # Print model to console
 svm
 # Plot model
@@ -144,13 +111,13 @@ svmImp <- varImp(svm, scale=TRUE)
 svmImp
 
 #make the SDM
-SVM <- predict(predictors, svm)
+SVM <- predict(GM, svm)
 plot(SVM)
 
 # random forest
 library(randomForest)
 
-rf <- train(as.factor(pb)~., data=sdmdata,  method = 'rf', metric=metric, trControl=control)
+rf <- train(as.factor(present) ~ ., data=sdmdata,  method = 'rf', metric=metric, trControl=control)
 # Print model to console
 rf
 
@@ -162,7 +129,7 @@ rfImp <- varImp(rf, scale=TRUE)
 rfImp
 
 #make the SDM
-RF <- predict(predictors, rf)
+RF <- predict(CM, rf)
 plot(RF)
 
 #compare accuracy among models
