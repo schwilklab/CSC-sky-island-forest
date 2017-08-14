@@ -121,9 +121,6 @@ MODEL_TYPES <- c("xgbTree", "svmRadial", "rf")
 # fits all models in MODEL_TYPES (three currently) and returns the resulting
 # models as a list indixed by model type string.
 
-# TODO: save all model summary and comparison output in a structured way. In
-# fact, we could simplify the code below to just fitting models and move
-# comparison and summaries to later.
 
 fitMods <- function(sdmd) {
   mods <- list()
@@ -132,30 +129,45 @@ fitMods <- function(sdmd) {
   for (mt in MODEL_TYPES) {
     mod <- caret::train(as.factor(present) ~ ., data=sdmd, method=mt,
                         metric=METRIC, trControl=CONTROL)
-    # Print model to console or sink
-    print(mod)
-    ## TODO save plot and name correctly:
-    plot(mod)
-
-    # variable importance
-    modImp <- varImp(mod, scale=TRUE)
-    print(modImp)
     mods[[mt]] <- mod
   }
+  return(mods)
+}
 
+# Model comparison and summaries
+checkMods <- function(themods, spcode) {
+
+  # save stats on each model
+  for (modt in names(themods)) { # iterate by name
+    mod <- themods[[modt]]
+     # Print model to console or sink
+    print(mod)
+    ## TODO save plot and name correctly:
+    pdf(file.path(OUT_DIR), paste(spcode, "_" modt, "_model_plot.pdf"))
+    plot(mod)
+    dev.off()
+    # variable importance
+    print("VARIABLE IMPORTANCE", modt)
+    modImp <- varImp(mod, scale=TRUE)
+    print(modImp)
+  }
   # compare accuracy among models
-  resamps <- resamples(mods)
+  print("MODEL_COMPARISON")
+  resamps <- resamples(themods)
   summary(resamps)
   print(resamps)
   diffs <- diff(resamps)
   print(summary(diffs))
   print(diffs)
-  
-  return(mods)
 }
 
 
-makePredictions <- function(tmods) {
+
+
+# take a list of models that predict the same species' distribution as a
+# funciton of bioclim vars. Create predictions for each of three mtn ranges and
+# save these as well as visualization.
+makePredictions <- function(tmods, spcode) {
   for (mtype in names(tmods)) {
     for (mountain in c("CM", "DM", "GM") ) {
       fname =  paste(mtype, mountain, sep="_")
@@ -173,30 +185,24 @@ makePredictions <- function(tmods) {
 ## test
 
 qugr3_mods <- fitMods(getLocations("QUGR3"))
-
 makePredictions(qugr3_mods)
 
 
-
-
-
-  
-## #make the SDM
-  ## prediction <- predict(CM, boost)
-  ## plot(Boost)
-
-
+## TODO: reclassify step?
 
 #reclassify rasters so that grids have binary values of 0 for absent or 1 for present
 # reclassify the values into three groups
-boostbin <- reclassify(Boost, c(0,1.98,0,1.99,2,1))
-svmbin <- reclassify(SVM, c(0,1.98,0,1.99,2,1))
-rfbin <- reclassify(RF, c(0,1.98,0,1.99,2,1))
+## boostbin <- reclassify(Boost, c(0,1.98,0,1.99,2,1))
+## svmbin <- reclassify(SVM, c(0,1.98,0,1.99,2,1))
+## rfbin <- reclassify(RF, c(0,1.98,0,1.99,2,1))
 
-#make the ensemble model: values of 0--no model predicts presence, 1--1 model predicts presence, etc.
+## #make the ensemble model: values of 0--no model predicts presence, 1--1 model predicts presence, etc.
 
-ensemble<-boostbin+svmbin+rfbin
-plot(ensemble)
-
+## ensemble<-boostbin+svmbin+rfbin
+## plot(ensemble)
 #writeRaster(ensemble, filename = "ensemble.tif", format="GTiff", overwrite=TRUE)
+
+
+
+#### Command line script ###
 
