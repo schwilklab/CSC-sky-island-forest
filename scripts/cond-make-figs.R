@@ -7,6 +7,8 @@ rm(list=ls())
 source("./cond-read-data.R")
 source("./weibull.R") # Reparameterized Weibull curves
 
+OUT_DIR <- "../results/traits/"
+
 library(reshape2)
 
 ## The ggplot theme for all figures.
@@ -50,7 +52,7 @@ plc50s <- merge(plc50s, taggedtrees, by = c("tag"), all.x=TRUE)
 
 ggplot(subset(plc50s, plc50 > -12 & spcode != "QUEM" & spcode != "JUPI"),
        aes(spcode, plc50)) + geom_boxplot()
-ggsave("../results-plots/plc50-by-species.pdf")
+ggsave(file.path(OUT_DIR, "plc50-by-species.pdf"))
 
 
 # By species with PLC50 lines
@@ -64,7 +66,7 @@ p <- ggplot(treecurves, aes(psi.real, fc.PLC)) +
 p
 #p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
 
-ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
+ggsave(file.path(OUT_DIR, "treecurves-2014-vuln-by-species.pdf"))
 
 # By tag and species with PLC50 lines 2015 only
 p <- ggplot(treecurves, aes(psi.real, fc.PLC, color=spcode)) +
@@ -77,7 +79,7 @@ p <- ggplot(treecurves, aes(psi.real, fc.PLC, color=spcode)) +
 p
 #p + geom_vline(aes(xintercept = plc50), data = plc50s, color = "black")
 
-ggsave("../results-plots/treecurves-2014-vuln-by-species.pdf")
+ggsave(file.path(OUT_DIR, "treecurves-2014-vuln-by-species.pdf"))
 
 ###################################################################
 # Weibull fits
@@ -152,5 +154,5 @@ ggplot(treecurves, aes(psi.real, PLC, color=tag)) +
     scale_y_continuous("PLC", limits=c(-0.1,1.1)) +
     facet_grid(spcode ~ .)
 
-ggsave("../results-plots/treecurves-2013-vuln-by-species-tag.pdf")
+ggsave(file.path(OUT_DIR, "treecurves-2013-vuln-by-species-tag.pdf"))
  
