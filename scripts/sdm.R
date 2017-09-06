@@ -12,9 +12,17 @@ library(raster)
 library(rgdal)
 library(dplyr)
 
+# TODO: restrict list to just those with enough distribution data?
+SPCODES <- c("JUDE2", "JUFL",  "JUPI",  "PICE",  "PIPO",  "PSME",  "QUEM",  "QUGR2", "QUGR3",
+             "QUMU",  "PIST3", "QUGA",  "QUHY",  "PIED")
+
+
+BIOCLIM_RECS_DIR <- "../../skyisland-climate/results/reconstructions/"
+SOIL_RECS_DIR <- "../../skyisland-climate/results/soil/"
 
 OUT_DIR <- "../results/sdms/"
 
+# take a data frame with x y coords in WGS84 and turn into a raster brick
 clim_data_2_brick <- function(df) {
   sp::coordinates(df) <- ~ x + y # converts object to "SpatialPointsDataFrame"
   #let's be explicit about projections:
@@ -23,21 +31,37 @@ clim_data_2_brick <- function(df) {
   return <- raster::brick(df)
 }
 
-# read all mtn ranges reference period summaries and store each range as a
-# separate raster "brick" (like a raster stack).
-CM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/CM____19612000.RDS"))
-CM <- clim_data_2_brick(CM)
-DM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/DM____19612000.RDS"))
-DM <- clim_data_2_brick(DM)
-GM <- data.frame(readRDS("../../skyisland-climate/results/reconstructions/GM____19612000.RDS"))
-GM <- clim_data_2_brick(GM)
+# function to retrieve bioclim and gswc projections by mtn range, gcm, scenario
+# and time period. These data to retrieve are all stored as rds files in the
+# skyisland-climate repo. Return as a raser brick.
+retrieve_reconstruction <- function(mtn, gcm=NULL, scenario=NULL, timep=NULL) {
+
+  base_name <- paste(mtn, gcm, scenario, timep, sep="_")
+  
+  if(is.null(gcm) ) {
+    base_name <- paste(base_name, "_19612000", ".RDS", sep="")
+  } else {
+    basename <- paste(base_name, ".RDS", sep="")
+  }
+
+  res <- data.frame(readRDS(file.path(BIOCLIM_RECS_DIR, base_name)))
+  soild <- data.frame(readRDS(file.path(SOIL_RECS_DIR, base_name)))
+  res <- dplyr::left_join(res, soild) # merge in gswc column
+  res <- clim_data_2_brick(res)
+  return(res)
+}
+
+# historical reconstruction raster bricks
+CM <- retrieve_reconstruction("CM")
+DM <- retrieve_reconstruction("DM")
+GM <- retrieve_reconstruction("GM")
 
 # we could then merge all of these into a single raster, eg
 # clim_data_all <- merge(CM, DM, tolerance = 1)
 # but I am worried about rounding accuracy. So for now, leave separate raster
-# bricks for each mtn range, but we can always combine extracted locaiton data
+# bricks for each mtn range, but we can always combine extracted location data
 # to run a model on all occurrence locations across all mtn ranges at once. But
-# we will need to run predicitions spearately for each range. I think this is
+# we will need to run predictions spearately for each range. I think this is
 # best solution as it allows breaking up the porblem for easier running on
 # workstatons or the computer cluster.
 
@@ -48,6 +72,11 @@ source("./read-distribution-data.R")
 # get a data frame of all bioclim variables with each row represneting an
 # occurrence location for the species. Extracts data from the raster blocks for
 # each mtn range and then concatenates the results.
+
+## TODO: read soil moisture projections see
+## https://github.com/schwilklab/CSC-sky-island-forest/issues/38
+
+
 getLocations <- function(species_code) {
   loclist <- list()
   
@@ -165,7 +194,7 @@ checkMods <- function(themods, spcode) {
 
 
 # take a list of models that predict the same species' distribution as a
-# funciton of bioclim vars. Create predictions for each of three mtn ranges and
+# function of bioclim vars. Create predictions for each of three mtn ranges and
 # save these as well as visualization.
 makePredictions <- function(tmods, spcode) {
   for (mtype in names(tmods)) {
