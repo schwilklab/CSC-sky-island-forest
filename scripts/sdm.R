@@ -73,10 +73,6 @@ source("./read-distribution-data.R")
 # occurrence location for the species. Extracts data from the raster blocks for
 # each mtn range and then concatenates the results.
 
-## TODO: read soil moisture projections see
-## https://github.com/schwilklab/CSC-sky-island-forest/issues/38
-
-
 getLocations <- function(species_code) {
   loclist <- list()
   
@@ -165,18 +161,18 @@ fitMods <- function(sdmd) {
 
 # Model comparison and summaries
 checkMods <- function(themods, spcode) {
-
   # save stats on each model
   for (modt in names(themods)) { # iterate by name
     mod <- themods[[modt]]
-     # Print model to console or sink
+    # Print model to console or sink
     print(mod)
     ## TODO save plot and name correctly:
-    pdf(file.path(OUT_DIR), paste(spcode, "_" modt, "_model_plot.pdf"))
+    oname <- file.path(OUT_DIR, paste(spcode, "_", modt, "_model_plot.pdf", sep=""))
+    pdf(oname)
     plot(mod)
     dev.off()
     # variable importance
-    print("VARIABLE IMPORTANCE", modt)
+    print(paste("VARIABLE IMPORTANCE", modt))
     modImp <- varImp(mod, scale=TRUE)
     print(modImp)
   }
@@ -189,8 +185,6 @@ checkMods <- function(themods, spcode) {
   print(summary(diffs))
   print(diffs)
 }
-
-
 
 
 # take a list of models that predict the same species' distribution as a
@@ -209,16 +203,12 @@ makePredictions <- function(tmods, spcode) {
   }
 }
 
-
-
 ## test
-
 qugr3_mods <- fitMods(getLocations("QUGR3"))
+checkMods(qugr3_mods, "QUGR3")
 makePredictions(qugr3_mods)
 
-
 ## TODO: reclassify step?
-
 #reclassify rasters so that grids have binary values of 0 for absent or 1 for present
 # reclassify the values into three groups
 ## boostbin <- reclassify(Boost, c(0,1.98,0,1.99,2,1))
