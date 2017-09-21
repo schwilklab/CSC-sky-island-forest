@@ -3,6 +3,8 @@
 
 library(dplyr)
 
+OUT_DIR <- "../results/traits/"
+
 source("./leaf-data-clean.R") # provides two data frames: CNLeaves and trees
 
 ###############################################################################
@@ -34,22 +36,22 @@ leaves <- merge(CNleaves, protein, by="tag", all=TRUE)
 # Data checks
 ggplot(aes(spcode, prot.ug.g, color=spcode), data=subset(leaves, grepl("^QU", spcode))) +
     geom_jitter()
-ggsave("../results-plots/protein-bymass.png")
+ggsave(file.path(OUT_DIR, "protein-bymass.png"))
 
 ggplot(aes(spcode, prot.ug.cm2), data=subset(leaves, grepl("^QU", spcode))) +
     geom_boxplot()
-ggsave("../results-plots/protein-byarea.png")
+ggsave(file.path(OUT_DIR,"protein-byarea.png"))
 
 
 ggplot(aes(spcode, prot.LMA, color=spcode), data=subset(leaves, grepl("^QU", spcode))) +
     geom_jitter()
-ggsave("../results-plots/protein-lma.png")
+ggsave(file.path(OUT_DIR,"protein-lma.png"))
 
 # so some wierd outliers. Caused by area or mass:
 
 ggplot(aes(pair.dry.mass, pair.wet.mass), data=protein.raw) +
     geom_point() + facet_grid(. ~ species)
-ggsave("../results-plots/protein-wet-dry-mass.png")
+ggsave(file.path(OUT_DIR,"protein-wet-dry-mass.png"))
 
 
 p <- ggplot(aes(prot.ug.cm2, prot.ug.g), data=subset(leaves, grepl("^QU", spcode))) +
