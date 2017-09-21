@@ -2,6 +2,7 @@
 
 library(plyr)
 library(lubridate)
+library(reshape2)
 
 # read in library for calculations and curves
 # NOTE: set working dir to dir of the current file!
@@ -58,7 +59,7 @@ treecurves <- plyr::rename(treecurves, c("notes.x" = "notes.stem", "notes.y" = "
 
 ## TODO: use correct pipette correction depending on date (we changed reservoirs
 ## in summer 2015).
-treecurves <- curveCalcs(treecurves)
+treecurves <- curveCalcs(treecurves, TRUE, TRUE)
 
 ###############################################################################
 ## Data consistency checks
@@ -78,10 +79,11 @@ names(treecurves)[3] <- "spcode"
 treecurves$spcode.y <- NULL
 
 
-# create column for triat
+# create column for trial
 treecurves$tag.date <- paste(treecurves$tag, "." , treecurves$date.collected, sep="")
 
-## remove faulty runs
+## remove faulty runs based on our run report folder. Probably should never have
+## become actual data but ok to remove here.
 badtags <- c("1001", "1002", "1004", "1008", "1016", "1017", "1018", "1019", "1020", "1051",
              "1053", "1056", "1101", "1102", "1111", "1136", "1137", "1139", "1140", "1210",
              "1211", "1220", "1221", "1257", "1259", "12XXE", "12XXE2", "12XXE3", "256",
@@ -103,4 +105,37 @@ treecurves$tag <- factor(treecurves$tag)
 #treecurves <- subset(treecurves, Use) # only keep stems marked for use
 
 ##  Write curve data out to speadsheet
-write.csv(treecurves, "../results-plots/treecurves.csv", row.names=FALSE)
+write.csv(treecurves, "../results/figs/treecurves.csv", row.names=FALSE)
+
+
+
+### summarize PLC50 by stem ###
+
+## Fit a weibull curve to each stem (useful for plotting)
+stem.models <- dlply(treecurves, c("tag.date"), fitweibull)
+
+# predicted values for figures
+stem.nd <- expand.grid(unique(treecurves$tag.date), seq(0,-7,-0.01))
+names(stem.nd) <- c("tag.date", "psi.real")
+
+stem.dataList <- dlply(stem.nd, c("tag.date"))
+pred <- function(df) {
+     predict(stem.models[[tag.date]], newdata = df)
+}
+
+stem.preds <- mdply(cbind(mod = stem.models, df = stem.dataList), function(mod, df) {
+  mutate(df, fc.PLC = predict(mod, newdata = df))
+})
+
+
+stem.traits <- ldply(stem.models, function(x) coef(x)[1])
+names(stem.traits) <- c("tag.date", "plc50")
+stem.traits$tag <-  colsplit(stem.traits$tag.date, pattern="\\.", names=c("tag", "date"))[,1]
+
+
+## calculate Kmax by stem ##
+stem.k <- treecurves %>% group_by(tag, spcode, tag.date) %>%
+  summarize(K.stem.max =  K.stem[closest(psi.real, -0.25)],
+            K.leaf.max =  K.leaf[closest(psi.real, -0.25)])
+
+stem.traits <- left_join(stem.k, stem.traits) %>% select(-tag.date)

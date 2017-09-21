@@ -1,7 +1,7 @@
 # Code to run xylem vulnerability curve stats and make figures
 
 # clear all objects
-rm(list=ls()) 
+#rm(list=ls()) 
 # first read in the current data. All file names hardcoded in the file below.
 # This also sources hydro.R
 source("./cond-read-data.R")

@@ -14,7 +14,7 @@ source("./leaf-data-clean.R") # provides two data frames: CNLeaves and trees
 # import file
 protein <- read.csv("../data/leaves/leaf-protein.csv", stringsAsFactors=FALSE, strip.white=TRUE)
 
-protein.raw <- protein %>% subset(notes != "PINES") %>% rowise() %>%
+protein.raw <- protein %>% subset(notes != "PINES") %>% rowwise() %>%
     mutate(A595 = mean(c(A595.1,A595.2,A595.3), na.rm=TRUE), # average absorbances
            # calculate ug of protein per mL solution we dilute the extract by 5
            # folds so we need to multiple protein by 5 all other numbers from
