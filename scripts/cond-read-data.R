@@ -96,6 +96,7 @@ treecurves <- subset(treecurves, ! tag %in% badtags)
 ###############################################################################
 ## Final cleaning, remove temporary columns and variables
 ###############################################################################
+library(dplyr)
 
 # merge in full species names according to USDA species code
 species <- read.csv("../species.csv")
@@ -118,15 +119,15 @@ stem.models <- dlply(treecurves, c("tag.date"), fitweibull)
 stem.nd <- expand.grid(unique(treecurves$tag.date), seq(0,-7,-0.01))
 names(stem.nd) <- c("tag.date", "psi.real")
 
-stem.dataList <- dlply(stem.nd, c("tag.date"))
-pred <- function(df) {
-     predict(stem.models[[tag.date]], newdata = df)
+stem.preds.l <- list()
+for(n in names(stem.models)) {
+  df <- filter(stem.nd, tag.date == n)
+  stem.preds.l[[n]] <- mutate(df, fc.PLC = predict(stem.models[[n]], df))
 }
+stem.preds <- bind_rows(stem.preds.l)
+stem.preds <- left_join(stem.preds, select(treecurves, tag, spcode, display.name, tag.date))
 
-stem.preds <- mdply(cbind(mod = stem.models, df = stem.dataList), function(mod, df) {
-  mutate(df, fc.PLC = predict(mod, newdata = df))
-})
-
+#stem.dataList <- dlply(stem.nd, c("tag.date"))
 
 stem.traits <- ldply(stem.models, function(x) coef(x)[1])
 names(stem.traits) <- c("tag.date", "plc50")
@@ -138,4 +139,4 @@ stem.k <- treecurves %>% group_by(tag, spcode, tag.date) %>%
   summarize(K.stem.max =  K.stem[closest(psi.real, -0.25)],
             K.leaf.max =  K.leaf[closest(psi.real, -0.25)])
 
-stem.traits <- left_join(stem.k, stem.traits) %>% select(-tag.date)
+stem.traits <- left_join(stem.k, stem.traits)  %>% select(-tag.date)

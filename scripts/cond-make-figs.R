@@ -10,6 +10,13 @@ source("./weibull.R") # Reparameterized Weibull curves
 OUT_DIR <- "../results/traits/"
 
 library(reshape2)
+library(extrafont)
+
+REMOVE_SP <- c("JUPI")
+
+treecurves <- filter(treecurves, ! (spcode %in% REMOVE_SP))
+
+
 
 ## The ggplot theme for all figures.
 bestfit <- geom_smooth(method="lm",se = F, color = "black", size=1.5)
@@ -50,6 +57,9 @@ plc50s$tag <- sapply(strsplit(as.character(plc50s$tag.date), ".", fixed=TRUE), f
 plc50s <- merge(plc50s, taggedtrees, by = c("tag"), all.x=TRUE)
 #plc50s$species.code <- reorder(plc50s$species.code,plc50s$plc50)
 
+ggplot(subset(plc50s, plc50 > -12 & spcode != "JUPI"),
+       aes(spcode, plc50)) + geom_boxplot()
+
 ggplot(subset(plc50s, plc50 > -12 & spcode != "QUEM" & spcode != "JUPI"),
        aes(spcode, plc50)) + geom_boxplot()
 ggsave(file.path(OUT_DIR, "plc50-by-species.pdf"))
@@ -68,7 +78,7 @@ p
 
 ggsave(file.path(OUT_DIR, "treecurves-2014-vuln-by-species.pdf"))
 
-# By tag and species with PLC50 lines 2015 only
+# By tag and species with PLC50 lines
 p <- ggplot(treecurves, aes(psi.real, fc.PLC, color=spcode)) +
     theme_bw() + themeopts +
     geom_point() +
@@ -83,42 +93,45 @@ ggsave(file.path(OUT_DIR, "treecurves-2014-vuln-by-species.pdf"))
 
 ###################################################################
 # Weibull fits
-# models per spcode / type
+# models per spcode for graphing
 
-## TODO
 
-## wmodels <- dlply(allplants, c("type", "display.name"), fitweibull)
-## species.type.nd <- expand.grid(unique(allplants$type),
-##                                unique(allplants$display.name), seq(0,-7,-0.01))
-## names(species.type.nd) <- c("type", "display.name", "psi.real")
+wmodels <- dlply(treecurves, c("display.name"), fitweibull)
+
+species.nd <- expand.grid(unique(treecurves$display.name), seq(0,-7,-0.01))
+ names(species.nd) <- c("display.name", "psi.real")
 
 ## pred <- function(df) {
-##      predict(wmodels[[paste(type, ".", display.name, sep="")]], newdata = df)
-## }
-## species.type.dataList <- dlply(species.type.nd, c("type", "display.name"))
+##       predict(wmodels[[paste(type, ".", display.name, sep="")]], newdata = df)
+##  }
+species.dataList <- dlply(species.nd, c("display.name"))
 
-## preds <- mdply(cbind(mod = wmodels, df = species.type.dataList), function(mod, df) {
-##   mutate(df, fc.PLC = predict(mod, newdata = df))
-## })
+species.preds <- mdply(cbind(mod = wmodels, df = species.dataList), function(mod, df) {
+  mutate(df, fc.PLC = predict(mod, newdata = df))
+})
 
-## # get per spcode/type P50s
-## plc50s <- ldply(wmodels, function(x) coef(x)[1])
-## names(plc50s) <- c("type", "display.name", "plc50")
+# get per spcode/type P50s
+species.plc50s <- ldply(wmodels, function(x) coef(x)[1])
+names(species.plc50s) <- c("display.name", "plc50")
 
 
-## p3 <- ggplot(allplants, aes(psi.real, fc.PLCp)) +
-##     geom_line(aes(psi.real, fc.PLC, group=tag.trial.type), data=stem.preds,
-##              color="gray80", size=0.7, alpha=0.8) +
-##     geom_line(aes(psi.real, fc.PLC), data=preds, color="black", size=1) +
-##     geom_point(size = 2, aes(position="jitter")) +        
-##     scale_y_continuous("Percent Loss Conductivity", limits=c(-10,110)) +
-##     scale_x_continuous("Xylem tension (MPa)") +
-##     facet_grid(display.name ~ type) +
-##     geom_vline(aes(xintercept = plc50), data = plc50s, color = "black") +
-##     themeopts +
-##     theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
-## ggsave("../results/fig-3-resprouts-adults-vuln-by-species-2col.pdf", plot=p3,
-##        width=col2, height=col2, units="cm")
+p3 <- ggplot(treecurves, aes(psi.real, fc.PLCp)) +
+    geom_line(aes(psi.real, fc.PLC, group=tag.date), data=stem.preds,
+             color="gray80", size=0.7, alpha=0.8) +
+    geom_line(aes(psi.real, fc.PLC), data=species.preds, color="black", size=1) +
+    geom_point(size = 2, alpha=0.6, fill="black") + #, aes(position="jitter")) +        
+    scale_y_continuous("Percent Loss Conductivity", limits=c(-10,110)) +
+    scale_x_continuous("Xylem tension (MPa)") +
+    facet_grid(display.name ~ .) +
+    geom_vline(aes(xintercept = plc50), data = species.plc50s, color = "black") +
+    themeopts +
+    theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
+p3
+ggsave("../results/traits/vuln-by-species-2col.pdf", plot=p3,
+       width=col2, height=2*col2, units="cm")
+
+ggsave("../results/traits/vuln-by-species-2col.png", plot=p3,
+       width=col2, height=2*col2, units="cm")
 
 
 
