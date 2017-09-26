@@ -12,7 +12,7 @@ OUT_DIR <- "../results/traits/"
 library(reshape2)
 library(extrafont)
 
-REMOVE_SP <- c("JUPI")
+REMOVE_SP <- c("JUPI", "QUMU")
 
 treecurves <- filter(treecurves, ! (spcode %in% REMOVE_SP))
 
@@ -60,8 +60,6 @@ plc50s <- merge(plc50s, taggedtrees, by = c("tag"), all.x=TRUE)
 ggplot(subset(plc50s, plc50 > -12 & spcode != "JUPI"),
        aes(spcode, plc50)) + geom_boxplot()
 
-ggplot(subset(plc50s, plc50 > -12 & spcode != "QUEM" & spcode != "JUPI"),
-       aes(spcode, plc50)) + geom_boxplot()
 ggsave(file.path(OUT_DIR, "plc50-by-species.pdf"))
 
 
@@ -79,7 +77,7 @@ p
 ggsave(file.path(OUT_DIR, "treecurves-2014-vuln-by-species.pdf"))
 
 # By tag and species with PLC50 lines
-p <- ggplot(treecurves, aes(psi.real, fc.PLC, color=spcode)) +
+p <- ggplot(filter(treecurves, grepl("Q", display.name)), aes(psi.real, fc.PLC, color=spcode)) +
     theme_bw() + themeopts +
     geom_point() +
     geom_smooth(size=1, span=0.9) +
@@ -115,7 +113,10 @@ species.plc50s <- ldply(wmodels, function(x) coef(x)[1])
 names(species.plc50s) <- c("display.name", "plc50")
 
 
-p3 <- ggplot(treecurves, aes(psi.real, fc.PLCp)) +
+
+## Figs for final report
+
+p2 <- ggplot(treecurves, aes(psi.real, fc.PLCp)) +
     geom_line(aes(psi.real, fc.PLC, group=tag.date), data=stem.preds,
              color="gray80", size=0.7, alpha=0.8) +
     geom_line(aes(psi.real, fc.PLC), data=species.preds, color="black", size=1) +
@@ -126,12 +127,85 @@ p3 <- ggplot(treecurves, aes(psi.real, fc.PLCp)) +
     geom_vline(aes(xintercept = plc50), data = species.plc50s, color = "black") +
     themeopts +
     theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
-p3
+p2
 ggsave("../results/traits/vuln-by-species-2col.pdf", plot=p3,
        width=col2, height=2*col2, units="cm")
 
 ggsave("../results/traits/vuln-by-species-2col.png", plot=p3,
        width=col2, height=2*col2, units="cm")
+
+
+# oak curves
+treecurves.oak <- filter(treecurves, grepl("Q", treecurves$display.name))
+stem.preds.oak <- filter(stem.preds, grepl("Q", stem.preds$display.name))
+species.preds.oak <-  filter(species.preds, grepl("Q", species.preds$display.name))
+species.plc50s.oak <- filter(species.plc50s , grepl("Q", species.plc50s$display.name))
+p2 <- ggplot(treecurves.oak, aes(psi.real, fc.PLCp)) +
+    geom_line(aes(psi.real, fc.PLC, group=tag.date), data=stem.preds.oak,
+             color="gray80", size=0.7, alpha=0.8) +
+    geom_line(aes(psi.real, fc.PLC), data=species.preds.oak, color="black", size=1) +
+    geom_point(size = 2, alpha=0.6, fill="black") + #, aes(position="jitter")) +        
+    scale_y_continuous("Percent Loss Conductivity", limits=c(-10,110)) +
+    scale_x_continuous("Xylem tension (MPa)") +
+    facet_grid(display.name ~ .) +
+    geom_vline(aes(xintercept = plc50), data = species.plc50s.oak, color = "black") +
+    themeopts +
+    theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
+p2
+ggsave("../results/traits/vuln-by-species-2col_oak.pdf", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
+ggsave("../results/traits/vuln-by-species-2col_oak.png", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
+
+# juniper curves
+treecurves.juniper <- filter(treecurves, grepl("J", treecurves$display.name))
+stem.preds.juniper <- filter(stem.preds, grepl("J", stem.preds$display.name))
+species.preds.juniper <-  filter(species.preds, grepl("J", species.preds$display.name))
+species.plc50s.juniper <- filter(species.plc50s , grepl("J", species.plc50s$display.name))
+p2 <- ggplot(treecurves.juniper, aes(psi.real, fc.PLCp)) +
+    geom_line(aes(psi.real, fc.PLC, group=tag.date), data=stem.preds.juniper,
+             color="gray80", size=0.7, alpha=0.8) +
+    geom_line(aes(psi.real, fc.PLC), data=species.preds.juniper, color="black", size=1) +
+    geom_point(size = 2, alpha=0.6, fill="black") + #, aes(position="jitter")) +        
+    scale_y_continuous("Percent Loss Conductivity", limits=c(-10,110)) +
+    scale_x_continuous("Xylem tension (MPa)") +
+    facet_grid(display.name ~ .) +
+    geom_vline(aes(xintercept = plc50), data = species.plc50s.juniper, color = "black") +
+    themeopts +
+    theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
+p2
+ggsave("../results/traits/vuln-by-species-2col_juniper.pdf", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
+ggsave("../results/traits/vuln-by-species-2col_juniper.png", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
+
+# pine curves
+treecurves.pine <- filter(treecurves, grepl("P", treecurves$display.name))
+stem.preds.pine <- filter(stem.preds, grepl("P", stem.preds$display.name))
+species.preds.pine <-  filter(species.preds, grepl("P", species.preds$display.name))
+species.plc50s.pine <- filter(species.plc50s , grepl("P", species.plc50s$display.name))
+p2 <- ggplot(treecurves.pine, aes(psi.real, fc.PLCp)) +
+    geom_line(aes(psi.real, fc.PLC, group=tag.date), data=stem.preds.pine,
+             color="gray80", size=0.7, alpha=0.8) +
+    geom_line(aes(psi.real, fc.PLC), data=species.preds.pine, color="black", size=1) +
+    geom_point(size = 2, alpha=0.6, fill="black") + #, aes(position="jitter")) +        
+    scale_y_continuous("Percent Loss Conductivity", limits=c(-10,110)) +
+    scale_x_continuous("Xylem tension (MPa)") +
+    facet_grid(display.name ~ .) +
+    geom_vline(aes(xintercept = plc50), data = species.plc50s.pine, color = "black") +
+    themeopts +
+    theme(strip.text.y = element_text(family=fontfamily, size = smsize, face="italic"))
+p2
+ggsave("../results/traits/vuln-by-species-2col_pine.pdf", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
+ggsave("../results/traits/vuln-by-species-2col_pine.png", plot=p2,
+       width=col2, height=2*col2, units="cm")
+
 
 
 

@@ -89,7 +89,21 @@ badtags <- c("1001", "1002", "1004", "1008", "1016", "1017", "1018", "1019", "10
              "1211", "1220", "1221", "1257", "1259", "12XXE", "12XXE2", "12XXE3", "256",
              "501", "901", "P3307")
 
+
 treecurves <- subset(treecurves, ! tag %in% badtags)
+
+# Two more bad curves hat for some reason were not marked as such in data file.
+treecurves <- subset(treecurves, ! (tag=="1133" & name=="Tailor"))
+treecurves <- subset(treecurves, ! (tag=="1135" & name=="Tailor"))
+treecurves <- subset(treecurves, tag!="1103")
+
+
+# remove species with little data
+REMOVE_SP <- c("JUPI", "QUMU")
+treecurves <- filter(treecurves, ! (spcode %in% REMOVE_SP))
+
+                     
+
 
 
 
