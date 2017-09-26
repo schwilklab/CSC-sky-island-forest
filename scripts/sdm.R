@@ -17,6 +17,11 @@ SPCODES <- c("JUDE2", "JUFL",  "JUPI",  "PICE",  "PIPO",  "PSME",  "QUEM",  "QUG
              "QUMU",  "PIST3", "QUGA",  "QUHY",  "PIED")
 
 
+gcms  <-  c("CCSM4.r6i1p1", "CNRM-CM5.r1i1p1", "CSIRO-Mk3-6-0.r2i1p1",
+        "HadGEM2-CC.r1i1p1", "inmcm4.r1i1p1", "IPSL-CM5A-LR.r1i1p1",
+        "MIROC5.r1i1p1", "MPI-ESM-LR.r1i1p1", "MRI-CGCM3.r1i1p1")
+scenarios <- c("rcp45", "rcp85")
+
 BIOCLIM_RECS_DIR <- "../../skyisland-climate/results/reconstructions/"
 SOIL_RECS_DIR <- "../../skyisland-climate/results/soil/"
 
@@ -33,15 +38,15 @@ clim_data_2_brick <- function(df) {
 
 # function to retrieve bioclim and gswc projections by mtn range, gcm, scenario
 # and time period. These data to retrieve are all stored as rds files in the
-# skyisland-climate repo. Return as a raser brick.
+# skyisland-climate repo. Return as a raster brick.
 retrieve_reconstruction <- function(mtn, gcm=NULL, scenario=NULL, timep=NULL) {
 
   base_name <- paste(mtn, gcm, scenario, timep, sep="_")
-  
+
   if(is.null(gcm) ) {
     base_name <- paste(base_name, "_19612000", ".RDS", sep="")
   } else {
-    basename <- paste(base_name, ".RDS", sep="")
+    base_name <- paste(base_name, ".RDS", sep="")
   }
 
   res <- data.frame(readRDS(file.path(BIOCLIM_RECS_DIR, base_name)))
@@ -76,7 +81,7 @@ source("./read-distribution-data.R")
 getLocations <- function(species_code) {
   loclist <- list()
   
-  for (m in c("CM", "DM", "GM") ) {
+  for (m in c("CM")) {#, "DM", "GM") ) { # temporarilly get only CM
     loc <- distribution_data %>%
       filter(spcode == species_code & mtn==m) %>% select(long, lat, present)
     if (nrow(loc) > 0 ) { # species occurs in that mtn range
@@ -149,7 +154,7 @@ MODEL_TYPES <- c("xgbTree", "svmRadial", "rf")
 
 fitMods <- function(sdmd) {
   mods <- list()
-  # don't use mtn range as a rpedictor for now
+  # don't use mtn range as a predictor for now
   sdmd <- select(sdmd, -mtn)
   for (mt in MODEL_TYPES) {
     mod <- caret::train(as.factor(present) ~ ., data=sdmd, method=mt,
@@ -187,26 +192,60 @@ checkMods <- function(themods, spcode) {
 }
 
 
+makePrediction <- function(mod, mtn, spcode, gcm=NULL, scenario=NULL, timep=NULL) {
+  if(is.null(gcm)) { # get historical
+    env_raster <- eval(parse(text = mtn))
+  } else {
+    env_raster <- retrieve_reconstruction( mtn, gcm, scenario, timep )
+  }
+  p <- raster::predict(env_raster, mod)
+  return(p)
+}
+
+   
+    
+
+
 # take a list of models that predict the same species' distribution as a
 # function of bioclim vars. Create predictions for each of three mtn ranges and
 # save these as well as visualization.
-makePredictions <- function(tmods, spcode) {
-  for (mtype in names(tmods)) {
-    for (mountain in c("CM", "DM", "GM") ) {
-      fname =  paste(mtype, mountain, sep="_")
-      p <- raster::predict(eval(parse(text = mountain)), tmods[[mtype]])
-      saveRDS(p, file.path(OUT_DIR, paste(fname, ".RDS", sep="")))
-      pdf(file.path(OUT_DIR, paste(fname, ".pdf", sep="")))
-      plot(p)
-      dev.off()
-    }
-  }
-}
+## makePredictions <- function(tmods, spcode) {
+##   for (mtype in names(tmods)) {
+##     for (mountain in c("CM", "DM", "GM") ) {
+##       fname =  paste(spcode, mtype, mountain, sep="_")
+##       p <- raster::predict(env_rastertmods[[mtype]])
+##       saveRDS(p, file.path(OUT_DIR, paste(fname, ".RDS", sep="")))
+##       pdf(file.path(OUT_DIR, paste(fname, ".pdf", sep="")))
+##       plot(p)
+##       dev.off()
+##     }
+##   }
+## }
 
 ## test
 qugr3_mods <- fitMods(getLocations("QUGR3"))
 checkMods(qugr3_mods, "QUGR3")
-makePredictions(qugr3_mods)
+
+qugr3_hist <- makePrediction(qugr3_mods[["xgbTree"]], "CM", "QUGR3")
+
+qugr3_proj <- makePrediction(qugr3_mods[["xgbTree"]], "CM", "QUGR3", "HadGEM2-CC.r1i1p1", "rcp85", "2080s")
+
+
+
+quem_mods <- fitMods(getLocations("QUEM"))
+checkMods(quem_mods, "QUEM")
+
+quem_hist <- makePrediction(quem_mods[["xgbTree"]], "CM", "QUEM")
+
+quem_proj <- makePrediction(quem_mods[["xgbTree"]], "CM", "QUEM", "HadGEM2-CC.r1i1p1", "rcp85", "2080s")
+
+png("../results/sdms/quem_hist_dist.png")
+plot(quem_hist-1.0)
+dev.off()
+
+png("../results/sdms/quem_hadgem2080s_dist.png")
+plot(quem_proj-1.0)
+dev.off()
 
 ## TODO: reclassify step?
 #reclassify rasters so that grids have binary values of 0 for absent or 1 for present
